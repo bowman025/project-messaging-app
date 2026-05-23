@@ -1,0 +1,14 @@
+{
+  "name": "@project-messaging-app/zod-schemas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./user": "./src/user.js",
+    "./message": "./src/message.js",
+    "./conversation": "./src/conversation.js"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
