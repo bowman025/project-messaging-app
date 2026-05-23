@@ -1,0 +1,27 @@
+{
+  "name": "project-messaging-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=apps/server",
+    "dev:client": "npm run dev -- workspace=apps/client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bowman025/project-messaging-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/bowman025/project-messaging-app/issues"
+  },
+  "homepage": "https://github.com/bowman025/project-messaging-app#readme"
+}
