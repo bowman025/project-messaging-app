@@ -22,7 +22,7 @@ export default {
     'jsx-a11y': jsxA11yPlugin,
   },
   settings: {
-    react: { version: 'detect' },
+    react: { version: '19.2' },
   },
   rules: {
     ...base.rules,

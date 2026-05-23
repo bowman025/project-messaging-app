@@ -3,8 +3,6 @@ import globals from 'globals';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default {
-  ...js.configs.recommended.rules,
-  ...eslintConfigPrettier.rules,
   languageOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
@@ -13,6 +11,8 @@ export default {
     },
   },
   rules: {
+    ...js.configs.recommended.rules,
+    ...eslintConfigPrettier.rules,
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prefer-const': 'error',
