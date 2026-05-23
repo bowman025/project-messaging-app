@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "concurrently --names server,client --prefix-colors blue,green \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/client\"",
     "dev:server": "npm run dev --workspace=apps/server",
     "dev:client": "npm run dev -- workspace=apps/client",
     "db:generate": "npm run db:generate --workspace=packages/db",
@@ -32,6 +33,7 @@
   },
   "homepage": "https://github.com/bowman025/project-messaging-app#readme",
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "prettier": "3.8.3"
   }
 }
