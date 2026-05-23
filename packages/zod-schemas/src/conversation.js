@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createConversationSchema = z.object({
   participantIds: z
-    .array(z.string().cuid('Invalid user ID'))
+    .array(z.string().cuid2('Invalid user ID'))
     .min(1, 'At least one participant is required'),
   name: z
     .string()

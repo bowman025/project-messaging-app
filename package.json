@@ -11,7 +11,13 @@
   "scripts": {
     "dev:server": "npm run dev --workspace=apps/server",
     "dev:client": "npm run dev -- workspace=apps/client",
-    "lint": "npm run lint --workspaces --if-present"
+    "db:generate": "npm run db:generate --workspace=packages/db",
+    "db:migrate": "npm run db:migrate --workspace=packages/db",
+    "db:studio": "npm run db:studio --workspace=packages/db",
+    "db:seed": "npm run db:seed --workspace=packages/db",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "repository": {
     "type": "git",
@@ -24,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/bowman025/project-messaging-app/issues"
   },
-  "homepage": "https://github.com/bowman025/project-messaging-app#readme"
+  "homepage": "https://github.com/bowman025/project-messaging-app#readme",
+  "devDependencies": {
+    "prettier": "3.8.3"
+  }
 }

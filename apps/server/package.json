@@ -10,6 +10,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@project-messaging-app/db": "^1.0.0",
     "@project-messaging-app/zod-schemas": "^1.0.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",

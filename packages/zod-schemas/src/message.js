@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const sendMessageSchema = z.object({
-  conversationId: z.string().cuid('Invalid conversation ID'),
+  conversationId: z.string().cuid2('Invalid conversation ID'),
   content: z
     .string()
     .min(1, 'Message cannot be empty')
