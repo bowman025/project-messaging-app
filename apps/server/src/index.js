@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import conversationRoutes from './routes/conversationRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { initSocket } from './config/socket.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -31,6 +32,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/conversations', conversationRoutes);
 
 app.use(errorHandler);
+
+initSocket(io);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
