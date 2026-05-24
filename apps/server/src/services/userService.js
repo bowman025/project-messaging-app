@@ -11,6 +11,17 @@ export const findUserById = async (id) => {
   return user;
 };
 
+export const findUsersByUsername = async (username, excludeId) => {
+  return db.user.findMany({
+    where: {
+      username: { contains: username, mode: 'insensitive' },
+      id: { not: excludeId },
+    },
+    select: { id: true, username: true, avatarUrl: true },
+    take: 10,
+  });
+};
+
 export const createUser = async ({ username, email, passwordHash }) => {
   return db.user.create({
     data: { username, email, passwordHash },
