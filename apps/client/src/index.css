@@ -60,6 +60,14 @@ body {
   --color-online: #22c55e;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
 /* ── Typography ── */
 h1,
 h2,
