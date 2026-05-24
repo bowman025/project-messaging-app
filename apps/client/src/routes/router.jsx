@@ -5,6 +5,7 @@ import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import ConversationsPage from '../pages/ConversationsPage.jsx';
 import ConversationPage from '../pages/ConversationPage.jsx';
+import NotFoundPage from '../pages/NotFoundPage.jsx';
 import { loginLoader, appLoader, conversationsLoader, conversationLoader } from './loaders.js';
 
 const router = createBrowserRouter([
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: 'conversations/:id', element: <ConversationPage />, loader: conversationLoader },
     ],
   },
+  { path: '*', element: <NotFoundPage /> },
 ]);
 
 export default router;

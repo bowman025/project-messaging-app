@@ -1,0 +1,24 @@
+import { create } from 'zustand';
+
+export const useMessageStore = create((set) => ({
+  messages: [],
+
+  setMessages: (messages) => set({ messages }),
+
+  addMessage: (message) =>
+    set((state) => ({
+      messages: [...state.messages, message],
+    })),
+
+  updateMessage: (updatedMessage) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === updatedMessage.id ? updatedMessage : m
+      ),
+    })),
+
+  deleteMessage: (messageId) =>
+    set((state) => ({
+      messages: state.messages.filter((m) => m.id !== messageId),
+    })),
+}));

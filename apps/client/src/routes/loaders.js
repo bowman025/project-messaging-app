@@ -1,10 +1,19 @@
 import { redirect } from 'react-router';
 import { getToken, fetchWithAuth, removeToken } from '../lib/api.js';
 
-export const appLoader = () => {
+export const appLoader = async () => {
   const token = getToken();
   if (!token) return redirect('/login');
-  return null;
+
+  const res = await fetchWithAuth('/api/conversations');
+  if (res.status === 401) {
+    removeToken();
+    return redirect('/login');
+  }
+  if (!res.ok) throw new Response('Failed to load conversations', { status: res.status });
+
+  const data = await res.json();
+  return data.conversations;
 };
 
 export const loginLoader = () => {
