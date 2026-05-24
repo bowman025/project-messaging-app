@@ -40,25 +40,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
+    <div className="auth-form">
       <h1>Login</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        <div className="form-field">
           <label htmlFor="email">Email</label>
           <input id="email" type="email" {...register('email')} />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
-        <div>
+        <div className="form-field">
           <label htmlFor="password">Password</label>
           <input id="password" type="password" {...register('password')} />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && <p className="form-error">{errors.password.message}</p>}
         </div>
-        {errors.root && <p>{errors.root.message}</p>}
-        <button type="submit" disabled={isSubmitting}>
+        {errors.root && <p className="form-root-error">{errors.root.message}</p>}
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p>No account yet? <Link to="/register">Register</Link></p>
+      <p className="auth-footer">No account yet? <Link to="/register">Register</Link></p>
     </div>
   );
 }

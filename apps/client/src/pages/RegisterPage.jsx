@@ -40,35 +40,35 @@ export default function RegisterPage() {
   };
 
   return (
-    <div>
+    <div className="auth-form">
       <h1>Register</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        <div className="form-field">
           <label htmlFor="username">Username</label>
           <input id="username" type="text" {...register('username')} />
-          {errors.username && <p>{errors.username.message}</p>}
+          {errors.username && <p className="form-error">{errors.username.message}</p>}
         </div>
-        <div>
+        <div className="form-field">
           <label htmlFor="email">Email</label>
           <input id="email" type="email" {...register('email')} />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
-        <div>
+        <div className="form-field">
           <label htmlFor="password">Password</label>
           <input id="password" type="password" {...register('password')} />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && <p className="form-error">{errors.password.message}</p>}
         </div>
-        <div>
+        <div className="form-field">
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input id="confirmPassword" type="password" {...register('confirmPassword')} />
-          {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
+          {errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}
         </div>
-        {errors.root && <p>{errors.root.message}</p>}
-        <button type="submit" disabled={isSubmitting}>
+        {errors.root && <p className="form-root-error">{errors.root.message}</p>}
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {isSubmitting ? 'Registering...' : 'Register'}
         </button>
       </form>
-      <p>Already have an account? <Link to="/login">Login</Link></p>
+      <p className="auth-footer">Already have an account? <Link to="/login">Login</Link></p>
     </div>
   );
 }

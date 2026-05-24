@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
+import { useTheme } from '../hooks/useTheme.js';
 import { formatDistanceToNow } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 
@@ -10,6 +11,7 @@ export default function Sidebar({ conversations }) {
   const { user, clearAuth } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
   const [showModal, setShowModal] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     clearAuth();
@@ -38,7 +40,12 @@ export default function Sidebar({ conversations }) {
     <aside className="sidebar">
       <div className="sidebar-header">
         <span>{user?.username}</span>
-        <button onClick={handleLogout}>Logout</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
       <div className="sidebar-actions">
         <button onClick={() => setShowModal(true)}>+ New Conversation</button>
