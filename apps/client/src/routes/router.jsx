@@ -6,7 +6,8 @@ import RegisterPage from '../pages/RegisterPage.jsx';
 import ConversationsPage from '../pages/ConversationsPage.jsx';
 import ConversationPage from '../pages/ConversationPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
-import { loginLoader, appLoader, conversationsLoader, conversationLoader } from './loaders.js';
+import ErrorPage from '../pages/ErrorPage.jsx';
+import { loginLoader, appLoader, conversationLoader } from './loaders.js';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
   },
   {
     element: <AuthLayout />,
+    errorElement: <ErrorPage />,
     children: [
       { path: 'login', element: <LoginPage />, loader: loginLoader },
       { path: 'register', element: <RegisterPage /> },
@@ -23,9 +25,15 @@ const router = createBrowserRouter([
   {
     element: <AppLayout />,
     loader: appLoader,
+    errorElement: <ErrorPage />,
     children: [
-      { path: 'conversations', element: <ConversationsPage />, loader: conversationsLoader },
-      { path: 'conversations/:id', element: <ConversationPage />, loader: conversationLoader },
+      { path: 'conversations', element: <ConversationsPage /> },
+      {
+        path: 'conversations/:id',
+        element: <ConversationPage />,
+        loader: conversationLoader,
+        errorElement: <ErrorPage />,
+      },
     ],
   },
   { path: '*', element: <NotFoundPage /> },
