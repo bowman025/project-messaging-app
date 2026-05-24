@@ -1,4 +1,8 @@
-import { getConversationsByUserId, getConversationById, createConversation } from '../services/conversationService.js';
+import {
+  getConversationsByUserId,
+  getConversationById,
+  createConversation,
+} from '../services/conversationService.js';
 import { AppError } from '../utils/AppError.js';
 import { createConversationSchema } from '@project-messaging-app/zod-schemas/conversation';
 
