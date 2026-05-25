@@ -2,6 +2,7 @@ import {
   getConversationsByUserId,
   getConversationById,
   createConversation,
+  deleteConversation,
 } from '../services/conversationService.js';
 import { AppError } from '../utils/AppError.js';
 import { createConversationSchema } from '@project-messaging-app/zod-schemas/conversation';
@@ -51,6 +52,15 @@ export const postConversation = async (req, res, next) => {
     });
 
     res.status(201).json({ status: 'success', conversation });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const removeConversation = async (req, res, next) => {
+  try {
+    await deleteConversation(req.params.id, req.user.id);
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

@@ -1,21 +1,39 @@
-import { NavLink, useNavigate } from 'react-router';
+import { useNavigate, useParams, NavLink } from 'react-router';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
-import { useTheme } from '../hooks/useTheme.js';
+import { useConversationStore } from '../store/conversationStore.js';
+import { fetchWithAuth } from '../lib/api.js';
 import { formatDistanceToNow } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
+import { useTheme } from '../hooks/useTheme.js';
 
 export default function Sidebar({ conversations }) {
   const navigate = useNavigate();
+  const { id: activeId } = useParams();
   const { user, clearAuth } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
+  const removeConversation = useConversationStore((state) => state.removeConversation);
   const [showModal, setShowModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     clearAuth();
     navigate('/login');
+  };
+
+  const handleDelete = async (e, conversationId) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const res = await fetchWithAuth(`/api/conversations/${conversationId}`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      removeConversation(conversationId);
+      if (activeId === conversationId) navigate('/conversations');
+    }
   };
 
   const getConversationName = (conversation) => {
@@ -70,9 +88,18 @@ export default function Sidebar({ conversations }) {
                 {getLastMessage(conversation)}
               </div>
             </div>
-            <div className="conversation-time">
-              {conversation.updatedAt &&
-                formatDistanceToNow(new Date(conversation.updatedAt), { addSuffix: true })}
+            <div className="conversation-meta">
+              <div className="conversation-time">
+                {conversation.updatedAt &&
+                  formatDistanceToNow(new Date(conversation.updatedAt), { addSuffix: true })}
+              </div>
+              <button
+                className="conversation-delete"
+                onClick={(e) => handleDelete(e, conversation.id)}
+                aria-label="Delete conversation"
+              >
+                ✕
+              </button>
             </div>
           </NavLink>
         ))}

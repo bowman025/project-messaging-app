@@ -312,6 +312,33 @@ input:focus {
   flex-shrink: 0;
 }
 
+.conversation-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.conversation-delete {
+  background: transparent;
+  color: transparent;
+  border: none;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.conversation-item:hover .conversation-delete {
+  color: var(--color-text-muted);
+}
+
+.conversation-delete:hover {
+  color: var(--color-danger) !important;
+  background: transparent;
+}
+
 .online-indicator {
   display: inline-block;
   width: 8px;

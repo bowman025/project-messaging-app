@@ -4,6 +4,7 @@ import {
   getConversations,
   getConversation,
   postConversation,
+  removeConversation,
 } from '../controllers/conversationController.js';
 import { postMessage, patchMessage, removeMessage } from '../controllers/messageController.js';
 
@@ -14,6 +15,7 @@ router.use(authenticate);
 router.get('/', getConversations);
 router.get('/:id', getConversation);
 router.post('/', postConversation);
+router.delete('/:id', removeConversation);
 
 router.post('/:conversationId/messages', postMessage);
 router.patch('/:conversationId/messages/:id', patchMessage);

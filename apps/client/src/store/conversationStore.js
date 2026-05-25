@@ -20,4 +20,9 @@ export const useConversationStore = create((set) => ({
         )
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
     })),
+
+  removeConversation: (id) =>
+    set((state) => ({
+      conversations: state.conversations.filter((c) => c.id !== id),
+    })),
 }));

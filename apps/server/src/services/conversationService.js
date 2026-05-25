@@ -57,3 +57,17 @@ export const createConversation = async ({ participantIds, name, isGroup }) => {
     },
   });
 };
+
+export const deleteConversation = async (id, userId) => {
+  const conversation = await db.conversation.findUnique({
+    where: { id },
+    include: { participants: true },
+  });
+
+  if (!conversation) throw new AppError('Conversation not found', 404);
+
+  const isMember = conversation.participants.some((p) => p.userId === userId);
+  if (!isMember) throw new AppError('Forbidden', 403);
+
+  return db.conversation.delete({ where: { id } });
+};
