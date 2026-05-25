@@ -14,15 +14,16 @@ export const useSocket = (conversations) => {
     socket.emit('join:conversations', conversationIds);
     socket.emit('presence:online', conversationIds);
 
-    socket.on('message:new', (message) => {
+    const handleNewMessage = (message) => {
       updateLastMessage(message.conversationId, message);
-    });
+    };
 
+    socket.on('message:new', handleNewMessage);
     socket.on('presence:online', ({ userId }) => setOnline(userId));
     socket.on('presence:offline', ({ userId }) => setOffline(userId));
 
     return () => {
-      socket.off('message:new');
+      socket.off('message:new', handleNewMessage);
       socket.off('presence:online');
       socket.off('presence:offline');
       disconnectSocket();

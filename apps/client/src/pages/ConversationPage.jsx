@@ -23,22 +23,26 @@ export default function ConversationPage() {
 
     socket.emit('join:conversation', id);
 
-    socket.on('message:new', (message) => {
+    const handleNewMessage = (message) => {
       if (message.conversationId === id) addMessage(message);
-    });
+    };
 
-    socket.on('message:edited', (message) => {
+    const handleEditedMessage = (message) => {
       if (message.conversationId === id) updateMessage(message);
-    });
+    };
 
-    socket.on('message:deleted', ({ messageId, conversationId }) => {
+    const handleDeletedMessage = ({ messageId, conversationId }) => {
       if (conversationId === id) deleteMessage(messageId);
-    });
+    };
+
+    socket.on('message:new', handleNewMessage);
+    socket.on('message:edited', handleEditedMessage);
+    socket.on('message:deleted', handleDeletedMessage);
 
     return () => {
-      socket.off('message:new');
-      socket.off('message:edited');
-      socket.off('message:deleted');
+      socket.off('message:new', handleNewMessage);
+      socket.off('message:edited', handleEditedMessage);
+      socket.off('message:deleted', handleDeletedMessage);
     };
   }, [id, addMessage, updateMessage, deleteMessage]);
 
