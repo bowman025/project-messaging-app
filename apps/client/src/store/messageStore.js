@@ -10,6 +10,16 @@ export const useMessageStore = create((set) => ({
       messages: [...state.messages, message],
     })),
 
+  confirmMessage: (tempId, realMessage) =>
+    set((state) => ({
+      messages: state.messages.map((m) => (m.id === tempId ? realMessage : m)),
+    })),
+
+  removeMessage: (id) =>
+    set((state) => ({
+      messages: state.messages.filter((m) => m.id !== id),
+    })),
+
   updateMessage: (updatedMessage) =>
     set((state) => ({
       messages: state.messages.map((m) =>

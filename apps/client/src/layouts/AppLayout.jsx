@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from 'react-router';
+import { Outlet, useLoaderData, useNavigation } from 'react-router';
 import { useEffect } from 'react';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -9,6 +9,9 @@ export default function AppLayout() {
   const { user, conversations: loaderConversations } = useLoaderData();
   const { conversations, setConversations } = useConversationStore();
   const setUser = useAuthStore((state) => state.setUser);
+  const navigation = useNavigation();
+
+  const isLoading = navigation.state === 'loading';
 
   useEffect(() => {
     setUser(user);
@@ -24,7 +27,13 @@ export default function AppLayout() {
     <div className="app-layout">
       <Sidebar conversations={conversations} />
       <main className="main-content">
-        <Outlet />
+        {isLoading ? (
+          <div className="loading-state">
+            <div className="loading-spinner" />
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   );

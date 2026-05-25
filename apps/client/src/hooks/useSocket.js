@@ -26,9 +26,12 @@ export const useSocket = (conversations) => {
       socket.off('message:new', handleNewMessage);
       socket.off('presence:online');
       socket.off('presence:offline');
-      disconnectSocket();
     };
   }, [conversations, setOnline, setOffline, updateLastMessage]);
+
+  useEffect(() => {
+    return () => disconnectSocket();
+  }, []);
 
   return getSocket();
 };

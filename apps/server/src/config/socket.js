@@ -24,7 +24,7 @@ export const initSocket = (io) => {
       }
     });
 
-    socket.on('message:send', async ({ conversationId, content }) => {
+    socket.on('message:send', async ({ conversationId, content, tempId }) => {
       try {
         await getConversationById(conversationId, userId);
 
@@ -34,9 +34,9 @@ export const initSocket = (io) => {
           content,
         });
 
-        io.to(conversationId).emit('message:new', message);
+        io.to(conversationId).emit('message:new', { ...message, tempId });
       } catch (err) {
-        socket.emit('error', { message: err.message });
+        socket.emit('error', { message: err.message, tempId });
       }
     });
 

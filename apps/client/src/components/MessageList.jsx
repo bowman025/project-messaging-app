@@ -32,7 +32,7 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
         const isOwn = message.authorId === currentUserId;
 
         return (
-          <div key={message.id} className={`message ${isOwn ? 'message--own' : ''}`}>
+          <div key={message.id} className={`message ${isOwn ? 'message--own' : ''} ${message.isOptimistic ? 'message--optimistic' : ''}`}>
             <span className="message-author">{message.author.username}</span>
             {editingId === message.id ? (
               <div className="message-edit">

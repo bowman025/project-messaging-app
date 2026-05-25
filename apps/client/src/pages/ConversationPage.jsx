@@ -9,7 +9,7 @@ import MessageInput from '../components/MessageInput.jsx';
 export default function ConversationPage() {
   const conversation = useLoaderData();
   const { id } = useParams();
-  const { messages, setMessages, addMessage, updateMessage, deleteMessage } = useMessageStore();
+  const { messages, setMessages, addMessage } = useMessageStore();
   const user = useAuthStore((state) => state.user);
   const bottomRef = useRef(null);
 
@@ -24,27 +24,39 @@ export default function ConversationPage() {
     socket.emit('join:conversation', id);
 
     const handleNewMessage = (message) => {
-      if (message.conversationId === id) addMessage(message);
+      if (message.conversationId === id) {
+        if (message.tempId) {
+          useMessageStore.getState().confirmMessage(message.tempId, message);
+        } else {
+          useMessageStore.getState().addMessage(message);
+        }
+      }
     };
 
     const handleEditedMessage = (message) => {
-      if (message.conversationId === id) updateMessage(message);
+      if (message.conversationId === id) useMessageStore.getState().updateMessage(message);
     };
 
     const handleDeletedMessage = ({ messageId, conversationId }) => {
-      if (conversationId === id) deleteMessage(messageId);
+      if (conversationId === id) useMessageStore.getState().deleteMessage(messageId);
+    };
+
+    const handleError = ({ tempId }) => {
+      if (tempId) useMessageStore.getState().removeMessage(tempId);
     };
 
     socket.on('message:new', handleNewMessage);
     socket.on('message:edited', handleEditedMessage);
     socket.on('message:deleted', handleDeletedMessage);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('message:new', handleNewMessage);
       socket.off('message:edited', handleEditedMessage);
       socket.off('message:deleted', handleDeletedMessage);
+      socket.off('error', handleError);
     };
-  }, [id, addMessage, updateMessage, deleteMessage]);
+  }, [id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,7 +65,27 @@ export default function ConversationPage() {
   const handleSend = (content) => {
     const socket = getSocket();
     if (!socket) return;
-    socket.emit('message:send', { conversationId: id, content });
+
+    const tempId = `temp_${Date.now()}`;
+
+    addMessage({
+      id: tempId,
+      tempId,
+      conversationId: id,
+      authorId: user.id,
+      content,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      edited: false,
+      author: {
+        id: user.id,
+        username: user.username,
+        avatarUrl: user.avatarUrl,
+      },
+      isOptimistic: true,
+    });
+
+    socket.emit('message:send', { conversationId: id, content, tempId });
   };
 
   const handleEdit = (messageId, content) => {
