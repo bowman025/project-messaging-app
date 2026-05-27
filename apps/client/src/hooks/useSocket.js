@@ -1,37 +1,89 @@
-import { useEffect } from 'react';
-import { connectSocket, disconnectSocket, getSocket } from '../lib/socket.js';
+import { useEffect, useRef } from 'react';
+import { connectSocket, getSocket } from '../lib/socket.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
+import { useMessageStore } from '../store/messageStore.js';
 
-export const useSocket = (conversations) => {
+export const useSocket = (conversations, activeConversationId) => {
   const { setOnline, setOffline } = usePresenceStore();
-  const { updateLastMessage } = useConversationStore();
+  const conversationsRef = useRef(conversations);
+  const activeConversationIdRef = useRef(activeConversationId);
+
+  useEffect(() => {
+    conversationsRef.current = conversations;
+  }, [conversations]);
+
+  useEffect(() => {
+    activeConversationIdRef.current = activeConversationId;
+
+    const socket = getSocket();
+    if (socket?.connected && activeConversationId) {
+      socket.emit('join:conversation', activeConversationId);
+    }
+  }, [activeConversationId]);
 
   useEffect(() => {
     const socket = connectSocket();
-    const conversationIds = conversations.map((c) => c.id);
 
-    socket.emit('join:conversations', conversationIds);
-    socket.emit('presence:online', conversationIds);
+    const joinConversations = () => {
+      const ids = conversationsRef.current.map((c) => c.id);
+      socket.emit('join:conversations', ids);
+      socket.emit('presence:online', ids);
+      if (activeConversationIdRef.current) {
+        socket.emit('join:conversation', activeConversationIdRef.current);
+      }
+    };
+
+    socket.on('connect', joinConversations);
+    if (socket.connected) joinConversations();
 
     const handleNewMessage = (message) => {
-      updateLastMessage(message.conversationId, message);
+      console.warn('useSocket handleNewMessage', message.id, 'active:', activeConversationIdRef.current, 'match:', message.conversationId === activeConversationIdRef.current);
+      useConversationStore.getState().updateLastMessage(message.conversationId, message);
+
+      if (message.conversationId === activeConversationIdRef.current) {
+        if (message.tempId) {
+          console.warn('useSocket handleNewMessage', message.id, 'active:', activeConversationIdRef.current, 'match:', message.conversationId === activeConversationIdRef.current, 'tempId:', message.tempId);
+          useMessageStore.getState().confirmMessage(message.tempId, message);
+        } else {
+          console.warn('calling addMessage from useSocket', message.id);
+          useMessageStore.getState().addMessage(message);
+        }
+      } else {
+        useConversationStore.getState().incrementUnread(message.conversationId);
+      }
     };
+
+    const handleEditedMessage = (message) => {
+      if (message.conversationId === activeConversationIdRef.current) {
+        useMessageStore.getState().updateMessage(message);
+      }
+    };
+
+    const handleDeletedMessage = ({ messageId, conversationId }) => {
+      if (conversationId === activeConversationIdRef.current) {
+        useMessageStore.getState().deleteMessage(messageId);
+      }
+    };
+
+    const handlePresenceOnline = ({ userId }) => setOnline(userId);
+    const handlePresenceOffline = ({ userId }) => setOffline(userId);
 
     socket.on('message:new', handleNewMessage);
-    socket.on('presence:online', ({ userId }) => setOnline(userId));
-    socket.on('presence:offline', ({ userId }) => setOffline(userId));
+    socket.on('message:edited', handleEditedMessage);
+    socket.on('message:deleted', handleDeletedMessage);
+    socket.on('presence:online', handlePresenceOnline);
+    socket.on('presence:offline', handlePresenceOffline);
 
     return () => {
+      socket.off('connect', joinConversations);
       socket.off('message:new', handleNewMessage);
-      socket.off('presence:online');
-      socket.off('presence:offline');
+      socket.off('message:edited', handleEditedMessage);
+      socket.off('message:deleted', handleDeletedMessage);
+      socket.off('presence:online', handlePresenceOnline);
+      socket.off('presence:offline', handlePresenceOffline);
     };
-  }, [conversations, setOnline, setOffline, updateLastMessage]);
-
-  useEffect(() => {
-    return () => disconnectSocket();
-  }, []);
+  }, [setOnline, setOffline]);
 
   return getSocket();
 };

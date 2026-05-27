@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData, useNavigation } from 'react-router';
+import { Outlet, useLoaderData, useNavigation, useParams } from 'react-router';
 import { useEffect } from 'react';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -10,6 +10,7 @@ export default function AppLayout() {
   const { conversations, setConversations } = useConversationStore();
   const setUser = useAuthStore((state) => state.setUser);
   const navigation = useNavigation();
+  const { id: activeConversationId } = useParams();
 
   const isLoading = navigation.state === 'loading';
 
@@ -21,7 +22,7 @@ export default function AppLayout() {
     setConversations(loaderConversations);
   }, [loaderConversations, setConversations]);
 
-  useSocket(conversations);
+  useSocket(conversations, activeConversationId);
 
   return (
     <div className="app-layout">

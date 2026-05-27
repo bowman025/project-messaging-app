@@ -6,7 +6,7 @@ let socket = null;
 export const getSocket = () => socket;
 
 export const connectSocket = () => {
-  if (socket?.connected) return socket;
+  if (socket) return socket;
 
   socket = io('/', {
     auth: { token: getToken() },

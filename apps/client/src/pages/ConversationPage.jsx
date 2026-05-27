@@ -1,6 +1,7 @@
 import { useLoaderData, useParams } from 'react-router';
 import { useEffect, useRef } from 'react';
 import { useMessageStore } from '../store/messageStore.js';
+import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { getSocket } from '../lib/socket.js';
 import ConversationHeader from '../components/ConversationHeader.jsx';
@@ -10,7 +11,10 @@ import MessageInput from '../components/MessageInput.jsx';
 export default function ConversationPage() {
   const conversation = useLoaderData();
   const { id } = useParams();
-  const { messages, setMessages, addMessage } = useMessageStore();
+  const messages = useMessageStore((state) => state.messages);
+  const setMessages = useMessageStore((state) => state.setMessages);
+  const addMessage = useMessageStore((state) => state.addMessage);
+  const clearUnread = useConversationStore((state) => state.clearUnread);
   const user = useAuthStore((state) => state.user);
   const bottomRef = useRef(null);
 
@@ -19,45 +23,8 @@ export default function ConversationPage() {
   }, [conversation.messages, setMessages]);
 
   useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-
-    socket.emit('join:conversation', id);
-
-    const handleNewMessage = (message) => {
-      if (message.conversationId === id) {
-        if (message.tempId) {
-          useMessageStore.getState().confirmMessage(message.tempId, message);
-        } else {
-          useMessageStore.getState().addMessage(message);
-        }
-      }
-    };
-
-    const handleEditedMessage = (message) => {
-      if (message.conversationId === id) useMessageStore.getState().updateMessage(message);
-    };
-
-    const handleDeletedMessage = ({ messageId, conversationId }) => {
-      if (conversationId === id) useMessageStore.getState().deleteMessage(messageId);
-    };
-
-    const handleError = ({ tempId }) => {
-      if (tempId) useMessageStore.getState().removeMessage(tempId);
-    };
-
-    socket.on('message:new', handleNewMessage);
-    socket.on('message:edited', handleEditedMessage);
-    socket.on('message:deleted', handleDeletedMessage);
-    socket.on('error', handleError);
-
-    return () => {
-      socket.off('message:new', handleNewMessage);
-      socket.off('message:edited', handleEditedMessage);
-      socket.off('message:deleted', handleDeletedMessage);
-      socket.off('error', handleError);
-    };
-  }, [id]);
+    clearUnread(id);
+  }, [id, clearUnread]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

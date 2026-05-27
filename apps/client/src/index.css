@@ -354,6 +354,18 @@ input:focus {
   flex-shrink: 0;
 }
 
+.unread-badge {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.4;
+}
+
 /* ── Conversation page ── */
 .conversation-page {
   display: flex;

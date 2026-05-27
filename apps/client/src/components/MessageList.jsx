@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import Avatar from './Avatar.jsx';
 
 export default function MessageList({ messages, currentUserId, onEdit, onDelete, bottomRef }) {
@@ -57,7 +57,10 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
                   {message.edited && <span className="message-edited"> (edited)</span>}
                 </p>
               )}
-              <span className="message-time">
+              <span
+                className="message-time"
+                title={format(new Date(message.createdAt), 'MMM d, yyyy HH:mm')}
+              >
                 {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
               </span>
               {isOwn && editingId !== message.id && (

@@ -5,7 +5,7 @@ import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { fetchWithAuth } from '../lib/api.js';
 import { disconnectSocket } from '../lib/socket.js';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
 import Avatar from './Avatar.jsx';
@@ -16,6 +16,7 @@ export default function Sidebar({ conversations }) {
   const { user, clearAuth } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
   const removeConversation = useConversationStore((state) => state.removeConversation);
+  const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
@@ -105,10 +106,18 @@ export default function Sidebar({ conversations }) {
               </div>
             </div>
             <div className="conversation-meta">
-              <div className="conversation-time">
+              <div
+                className="conversation-time"
+                title={conversation.updatedAt
+                  ? format(new Date(conversation.updatedAt), 'MMM d, yyyy HH:mm')
+                  : ''}
+              >
                 {conversation.updatedAt &&
                   formatDistanceToNow(new Date(conversation.updatedAt), { addSuffix: true })}
               </div>
+              {unreadCounts[conversation.id] > 0 && (
+                <span className="unread-badge">{unreadCounts[conversation.id]}</span>
+              )}
               <button
                 className="conversation-delete"
                 onClick={(e) => handleDelete(e, conversation.id)}
