@@ -51,6 +51,7 @@ export default function Sidebar({ conversations }) {
   };
 
   const isConversationOnline = (conversation) => {
+    if (conversation.isGroup) return false;
     return conversation.participants.some(
       (p) => p.user.id !== user?.id && onlineUsers.has(p.user.id)
     );
