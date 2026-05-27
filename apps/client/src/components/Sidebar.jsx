@@ -8,6 +8,7 @@ import { disconnectSocket } from '../lib/socket.js';
 import { formatDistanceToNow } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
+import Avatar from './Avatar.jsx';
 
 export default function Sidebar({ conversations }) {
   const navigate = useNavigate();
@@ -38,6 +39,11 @@ export default function Sidebar({ conversations }) {
     }
   };
 
+  const getOtherUser = (conversation) => {
+    if (conversation.isGroup) return null;
+    return conversation.participants.find((p) => p.user.id !== user?.id)?.user ?? null;
+  };
+
   const getConversationName = (conversation) => {
     if (conversation.name) return conversation.name;
     const other = conversation.participants.find((p) => p.user.id !== user?.id);
@@ -60,7 +66,10 @@ export default function Sidebar({ conversations }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <Link to="/profile" className="sidebar-username">{user?.username}</Link>
+        <div className="sidebar-user">
+          <Avatar user={user} size="sm" />
+          <Link to="/profile" className="sidebar-username">{user?.username}</Link>
+        </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button onClick={toggleTheme} aria-label="Toggle theme">
             {theme === 'light' ? '🌙' : '☀️'}
@@ -80,6 +89,10 @@ export default function Sidebar({ conversations }) {
               isActive ? 'conversation-item active' : 'conversation-item'
             }
           >
+            <Avatar
+              user={conversation.isGroup ? null : getOtherUser(conversation)}
+              size="md"
+            />
             <div className="conversation-info">
               <div className="conversation-name">
                 {getConversationName(conversation)}

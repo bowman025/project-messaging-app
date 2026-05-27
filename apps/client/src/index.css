@@ -240,6 +240,12 @@ input:focus {
   border-color: var(--color-danger);
 }
 
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .sidebar-actions {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--color-border);
@@ -371,6 +377,9 @@ input:focus {
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .conversation-header-name {
@@ -382,6 +391,39 @@ input:focus {
   font-size: 0.8rem;
   color: var(--color-text-muted);
   margin-top: 0.1rem;
+}
+
+/* ── Avatar ── */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar--sm {
+  width: 28px;
+  height: 28px;
+  font-size: 0.6rem;
+}
+
+.avatar--md {
+  width: 36px;
+  height: 36px;
+  font-size: 0.75rem;
+}
+
+.avatar--lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1rem;
+}
+
+.avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 /* ── Profile page ── */
@@ -483,13 +525,23 @@ input:focus {
 
 .message {
   display: flex;
-  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
   max-width: 65%;
-  gap: 0.2rem;
 }
 
 .message--own {
   align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.message--own .message-body {
   align-items: flex-end;
 }
 
