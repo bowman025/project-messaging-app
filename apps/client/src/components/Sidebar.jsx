@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { fetchWithAuth } from '../lib/api.js';
+import { disconnectSocket } from '../lib/socket.js';
 import { formatDistanceToNow } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
@@ -18,6 +19,7 @@ export default function Sidebar({ conversations }) {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
+    disconnectSocket();
     clearAuth();
     navigate('/login');
   };
