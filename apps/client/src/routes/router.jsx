@@ -3,6 +3,7 @@ import AuthLayout from '../layouts/AuthLayout.jsx';
 import AppLayout from '../layouts/AppLayout.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
+import ProfilePage from '../pages/ProfilePage.jsx';
 import ConversationsPage from '../pages/ConversationsPage.jsx';
 import ConversationPage from '../pages/ConversationPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
     loader: appLoader,
     errorElement: <ErrorPage />,
     children: [
+      { path: 'profile', element: <ProfilePage /> },
       { path: 'conversations', element: <ConversationsPage /> },
       {
         path: 'conversations/:id',

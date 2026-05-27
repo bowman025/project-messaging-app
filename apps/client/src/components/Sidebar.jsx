@@ -1,4 +1,4 @@
-import { useNavigate, useParams, NavLink } from 'react-router';
+import { useNavigate, useParams, NavLink, Link } from 'react-router';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
@@ -60,7 +60,7 @@ export default function Sidebar({ conversations }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <span>{user?.username}</span>
+        <Link to="/profile" className="sidebar-username">{user?.username}</Link>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button onClick={toggleTheme} aria-label="Toggle theme">
             {theme === 'light' ? '🌙' : '☀️'}

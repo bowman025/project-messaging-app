@@ -384,6 +384,93 @@ input:focus {
   margin-top: 0.1rem;
 }
 
+/* ── Profile page ── */
+.profile-page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--color-bg);
+}
+
+.profile-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-header h1 {
+  font-size: 1.25rem;
+}
+
+.btn-back {
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.btn-back:hover {
+  color: var(--color-text);
+}
+
+.profile-form textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.profile-form textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.form-success {
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+[data-theme='dark'] .form-success {
+  background: #0f2e1a;
+  color: #4ade80;
+}
+
+.sidebar-username {
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.sidebar-username:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
 /* ── Message list ── */
 .message-list {
   flex: 1;
