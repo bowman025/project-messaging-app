@@ -8,7 +8,7 @@ export const getConversationsByUserId = async (userId) => {
     },
     include: {
       participants: {
-        include: { user: { select: { id: true, username: true, avatarUrl: true } } },
+        include: { user: { select: { id: true, username: true, avatarUrl: true, bio: true } } },
       },
       messages: {
         orderBy: { createdAt: 'desc' },
@@ -24,7 +24,7 @@ export const getConversationById = async (id, userId) => {
     where: { id },
     include: {
       participants: {
-        include: { user: { select: { id: true, username: true, avatarUrl: true } } },
+        include: { user: { select: { id: true, username: true, avatarUrl: true, bio: true } } },
       },
       messages: {
         orderBy: { createdAt: 'asc' },
@@ -52,7 +52,7 @@ export const createConversation = async ({ participantIds, name, isGroup }) => {
     },
     include: {
       participants: {
-        include: { user: { select: { id: true, username: true, avatarUrl: true } } },
+        include: { user: { select: { id: true, username: true, avatarUrl: true, bio: true } } },
       },
     },
   });

@@ -405,6 +405,13 @@ input:focus {
   margin-top: 0.1rem;
 }
 
+.conversation-header-bio {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+
 /* ── Avatar ── */
 .avatar {
   border-radius: 50%;

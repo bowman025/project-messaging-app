@@ -34,6 +34,9 @@ export default function ConversationHeader({ conversation }) {
       <div>
         <div className="conversation-header-name">{getName()}</div>
         <div className="conversation-header-subtitle">{getSubtitle()}</div>
+        {!conversation.isGroup && otherUser?.bio && (
+          <div className="conversation-header-bio">{otherUser.bio}</div>
+        )}
       </div>
     </div>
   );
