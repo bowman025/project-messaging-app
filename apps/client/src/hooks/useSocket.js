@@ -38,15 +38,12 @@ export const useSocket = (conversations, activeConversationId) => {
     if (socket.connected) joinConversations();
 
     const handleNewMessage = (message) => {
-      console.warn('useSocket handleNewMessage', message.id, 'active:', activeConversationIdRef.current, 'match:', message.conversationId === activeConversationIdRef.current);
       useConversationStore.getState().updateLastMessage(message.conversationId, message);
 
       if (message.conversationId === activeConversationIdRef.current) {
         if (message.tempId) {
-          console.warn('useSocket handleNewMessage', message.id, 'active:', activeConversationIdRef.current, 'match:', message.conversationId === activeConversationIdRef.current, 'tempId:', message.tempId);
           useMessageStore.getState().confirmMessage(message.tempId, message);
         } else {
-          console.warn('calling addMessage from useSocket', message.id);
           useMessageStore.getState().addMessage(message);
         }
       } else {

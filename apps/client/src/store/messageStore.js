@@ -6,7 +6,6 @@ export const useMessageStore = create((set) => ({
   setMessages: (messages) => set({ messages }),
 
   addMessage: (message) => {
-    console.warn('addMessage called', message.id);
     set((state) => ({
       messages: [...state.messages, message],
     }));
