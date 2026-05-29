@@ -31,3 +31,4 @@ export const updateProfileSchema = z.object({
   avatarUrl: z.string().url('Invalid URL').optional(),
   bio: z.string().max(160, 'Bio must be at most 160 characters').optional(),
 });
+

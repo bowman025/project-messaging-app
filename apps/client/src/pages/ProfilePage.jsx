@@ -1,21 +1,27 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { updateProfileSchema } from '@project-messaging-app/zod-schemas/user';
 import { useAuthStore } from '../store/authStore.js';
 import { fetchWithAuth } from '../lib/api.js';
+import { uploadImage } from '../lib/upload.js';
+import Avatar from '../components/Avatar.jsx';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const [success, setSuccess] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl ?? null);
+  const fileInputRef = useRef(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
     setError,
+    setValue,
   } = useForm({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
@@ -24,6 +30,30 @@ export default function ProfilePage() {
       bio: user?.bio ?? '',
     },
   });
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+
+    setIsUploading(true);
+    try {
+      const url = await uploadImage(file, 'avatar');
+      setValue('avatarUrl', url, { shouldDirty: true });
+      setAvatarPreview(url);
+    } catch (_err) {
+      setError('root', { message: 'Failed to upload avatar. Please try again.' });
+      setAvatarPreview(user?.avatarUrl ?? null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = async (data) => {
     setSuccess(false);
@@ -57,17 +87,35 @@ export default function ProfilePage() {
           <h1>Edit Profile</h1>
         </div>
 
+        <div className="avatar-upload">
+          <div className="avatar-upload-preview">
+            <Avatar
+              user={{ ...user, avatarUrl: avatarPreview }}
+              size="lg"
+            />
+            <button
+              type="button"
+              className="avatar-upload-btn"
+              onClick={handleAvatarClick}
+              disabled={isUploading}
+            >
+              {isUploading ? 'Uploading...' : 'Change'}
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-field">
             <label htmlFor="username">Username</label>
             <input id="username" type="text" {...register('username')} />
             {errors.username && <p className="form-error">{errors.username.message}</p>}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="avatarUrl">Avatar URL</label>
-            <input id="avatarUrl" type="text" placeholder="https://..." {...register('avatarUrl')} />
-            {errors.avatarUrl && <p className="form-error">{errors.avatarUrl.message}</p>}
           </div>
 
           <div className="form-field">
@@ -79,7 +127,7 @@ export default function ProfilePage() {
           {errors.root && <p className="form-root-error">{errors.root.message}</p>}
           {success && <p className="form-success">Profile updated successfully.</p>}
 
-          <button type="submit" className="btn-primary" disabled={isSubmitting || !isDirty}>
+          <button type="submit" className="btn-primary" disabled={isSubmitting || isUploading || !isDirty}>
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
