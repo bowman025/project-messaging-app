@@ -30,7 +30,7 @@ export default function ConversationPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (content) => {
+  const handleSend = ({ content, imageUrl } = {}) => {
     const socket = getSocket();
     if (!socket) return;
 
@@ -41,7 +41,8 @@ export default function ConversationPage() {
       tempId,
       conversationId: id,
       authorId: user.id,
-      content,
+      content: content ?? null,
+      imageUrl: imageUrl ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       edited: false,
@@ -53,7 +54,7 @@ export default function ConversationPage() {
       isOptimistic: true,
     });
 
-    socket.emit('message:send', { conversationId: id, content, tempId });
+    socket.emit('message:send', { conversationId: id, content, imageUrl, tempId });
   };
 
   const handleEdit = (messageId, content) => {

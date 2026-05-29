@@ -52,10 +52,24 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
                   <button onClick={cancelEdit}>Cancel</button>
                 </div>
               ) : (
-                <p className="message-content">
-                  {message.content}
-                  {message.edited && <span className="message-edited"> (edited)</span>}
-                </p>
+                <div className="message-content">
+                  {message.imageUrl && (
+                    <button
+                      className="message-image-btn"
+                      onClick={() => window.open(message.imageUrl, '_blank')}
+                      aria-label="Open attachment"
+                    >
+                      <img
+                        src={message.imageUrl}
+                        alt="Attachment"
+                        className="message-image"
+                      />
+                    </button>
+                  )}
+                  {message.content && (
+                    <p>{message.content}{message.edited && <span className="message-edited"> (edited)</span>}</p>
+                  )}
+                </div>
               )}
               <span
                 className="message-time"
