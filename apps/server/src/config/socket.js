@@ -23,10 +23,16 @@ export const initSocket = (io) => {
       }
     });
 
-    socket.on('message:send', async ({ conversationId, content, tempId }) => {
+    socket.on('message:send', async ({ conversationId, content, imageUrl, tempId }) => {
       try {
         await getConversationById(conversationId, userId);
-        const message = await createMessage({ conversationId, authorId: userId, content });
+
+        const message = await createMessage({
+          conversationId,
+          authorId: userId,
+          content,
+          imageUrl,
+        });
 
         socket.to(conversationId).emit('message:new', message);
         socket.emit('message:new', { ...message, tempId });

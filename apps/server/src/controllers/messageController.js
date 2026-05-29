@@ -7,6 +7,7 @@ export const postMessage = async (req, res, next) => {
     const parsed = sendMessageSchema.safeParse({
       conversationId: req.params.conversationId,
       content: req.body.content,
+      imageUrl: req.body.imageUrl,
     });
     if (!parsed.success) return next(parsed.error);
 
@@ -16,6 +17,7 @@ export const postMessage = async (req, res, next) => {
       conversationId: parsed.data.conversationId,
       authorId: req.user.id,
       content: parsed.data.content,
+      imageUrl: parsed.data.imageUrl,
     });
 
     res.status(201).json({ status: 'success', message });

@@ -1,10 +1,10 @@
 import db from '@project-messaging-app/db';
 import { AppError } from '../utils/AppError.js';
 
-export const createMessage = async ({ conversationId, authorId, content }) => {
+export const createMessage = async ({ conversationId, authorId, content, imageUrl }) => {
   const [message] = await db.$transaction([
     db.message.create({
-      data: { conversationId, authorId, content },
+      data: { conversationId, authorId, content, imageUrl },
       include: { author: { select: { id: true, username: true, avatarUrl: true } } },
     }),
     db.conversation.update({
