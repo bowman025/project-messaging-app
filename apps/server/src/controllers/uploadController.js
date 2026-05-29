@@ -20,6 +20,7 @@ export const getUploadSignature = (req, res) => {
   const paramsToSign = {
     folder,
     timestamp,
+    allowed_formats: 'jpg,jpeg,png,webp,gif',
   };
 
   const signature = cloudinary.utils.api_sign_request(
