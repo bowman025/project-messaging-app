@@ -29,7 +29,7 @@ export default function Avatar({ user, size = 'md' }) {
   return (
     <div
       className={`avatar avatar--${size} avatar--initials`}
-      style={{ backgroundColor: color }}
+      style={{ '--avatar-color': color }}
       aria-label={user?.username}
     >
       {initials}

@@ -54,6 +54,7 @@ export default function Sidebar({ conversations }) {
   const getLastMessage = (conversation) => {
     const msg = conversation.messages?.[0];
     if (!msg) return 'No messages yet';
+    if (msg.imageUrl && !msg.content) return '📷 Image';
     return msg.content.length > 40 ? msg.content.slice(0, 40) + '...' : msg.content;
   };
 
@@ -71,7 +72,7 @@ export default function Sidebar({ conversations }) {
           <Avatar user={user} size="sm" />
           <Link to="/profile" className="sidebar-username">{user?.username}</Link>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div className="sidebar-header-actions">
           <button onClick={toggleTheme} aria-label="Toggle theme">
             {theme === 'light' ? '🌙' : '☀️'}
           </button>

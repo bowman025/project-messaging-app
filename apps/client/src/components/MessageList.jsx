@@ -66,6 +66,7 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
                         src={message.imageUrl}
                         alt="Attachment"
                         className="message-image"
+                        onLoad={() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' })}
                       />
                     </button>
                   )}
