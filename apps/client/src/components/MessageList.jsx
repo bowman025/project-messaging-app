@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import Avatar from './Avatar.jsx';
 
-export default function MessageList({ messages, currentUserId, onEdit, onDelete, bottomRef }) {
+export default function MessageList({ messages, currentUserId, onEdit, onDelete, bottomRef, topRef, hasMore, containerRef }) {
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const editInputRef = useRef(null);
@@ -28,7 +28,10 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
   };
 
   return (
-    <div className="message-list">
+    <div className="message-list" ref={containerRef}>
+      <div ref={topRef} className="message-list-top">
+        {hasMore && <div className="loading-spinner" />}
+      </div>
       {messages.map((message) => {
         const isOwn = message.authorId === currentUserId;
 

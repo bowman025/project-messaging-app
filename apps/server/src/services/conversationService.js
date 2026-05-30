@@ -19,16 +19,12 @@ export const getConversationsByUserId = async (userId) => {
   });
 };
 
-export const getConversationById = async (id, userId) => {
+export const getConversationById = async (id, userId, cursor = null, limit = 30) => {
   const conversation = await db.conversation.findUnique({
     where: { id },
     include: {
       participants: {
         include: { user: { select: { id: true, username: true, avatarUrl: true, bio: true } } },
-      },
-      messages: {
-        orderBy: { createdAt: 'asc' },
-        include: { author: { select: { id: true, username: true, avatarUrl: true } } },
       },
     },
   });
@@ -38,7 +34,23 @@ export const getConversationById = async (id, userId) => {
   const isMember = conversation.participants.some((p) => p.userId === userId);
   if (!isMember) throw new AppError('Forbidden', 403);
 
-  return conversation;
+  const messages = await db.message.findMany({
+    where: {
+      conversationId: id,
+      ...(cursor ? { createdAt: { lt: (await db.message.findUnique({ where: { id: cursor } }))?.createdAt } } : {}),
+    },
+    include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  const chronologicalMessages = messages.reverse();
+
+  return {
+    ...conversation,
+    messages: chronologicalMessages,
+    nextCursor: messages.length === limit ? chronologicalMessages[0].id : null,
+  };
 };
 
 export const createConversation = async ({ participantIds, name, isGroup }) => {

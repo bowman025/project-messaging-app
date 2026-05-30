@@ -4,8 +4,27 @@ import {
   createConversation,
   deleteConversation,
 } from '../services/conversationService.js';
+import { getMessagesByConversationId } from '../services/messageService.js';
 import { AppError } from '../utils/AppError.js';
 import { createConversationSchema } from '@project-messaging-app/zod-schemas/conversation';
+
+export const getMessages = async (req, res, next) => {
+  try {
+    const { cursor, limit } = req.query;
+
+    await getConversationById(req.params.id, req.user.id);
+
+    const messages = await getMessagesByConversationId(
+      req.params.id,
+      cursor ?? null,
+      limit ? parseInt(limit) : 30
+    );
+
+    res.json({ status: 'success', ...messages });
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const getConversations = async (req, res, next) => {
   try {
@@ -18,7 +37,13 @@ export const getConversations = async (req, res, next) => {
 
 export const getConversation = async (req, res, next) => {
   try {
-    const conversation = await getConversationById(req.params.id, req.user.id);
+    const { cursor, limit } = req.query;
+    const conversation = await getConversationById(
+      req.params.id,
+      req.user.id,
+      cursor ?? null,
+      limit ? parseInt(limit) : 30
+    );
     res.json({ status: 'success', conversation });
   } catch (err) {
     next(err);

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/authenticate.js';
 import {
+  getMessages,
   getConversations,
   getConversation,
   postConversation,
@@ -17,6 +18,7 @@ router.get('/:id', getConversation);
 router.post('/', postConversation);
 router.delete('/:id', removeConversation);
 
+router.get('/:id/messages', getMessages);
 router.post('/:conversationId/messages', postMessage);
 router.patch('/:conversationId/messages/:id', patchMessage);
 router.delete('/:conversationId/messages/:id', removeMessage);

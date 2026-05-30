@@ -2,14 +2,29 @@ import { create } from 'zustand';
 
 export const useMessageStore = create((set) => ({
   messages: [],
+  nextCursor: null,
+  hasMore: true,
 
-  setMessages: (messages) => set({ messages }),
+  setMessages: (messages, nextCursor) => set({
+    messages,
+    nextCursor: nextCursor ?? null,
+    hasMore: nextCursor !== null,
+  }),
 
-  addMessage: (message) => {
+  prependMessages: (olderMessages, nextCursor) =>
+    set((state) => ({
+      messages: [
+        ...olderMessages.map((m) => ({ ...m, isOlderBatch: true })),
+        ...state.messages,
+      ],
+      nextCursor: nextCursor ?? null,
+      hasMore: nextCursor !== null,
+    })),
+
+  addMessage: (message) =>
     set((state) => ({
       messages: [...state.messages, message],
-    }));
-  },
+    })),
 
   confirmMessage: (tempId, realMessage) =>
     set((state) => ({
