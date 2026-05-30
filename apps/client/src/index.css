@@ -558,6 +558,58 @@ input:focus {
   color: var(--color-primary-text);
 }
 
+/* ── Typing indicator ── */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 1rem 0;
+  min-height: 24px;
+}
+
+.typing-text {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.typing-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  animation: typing-bounce 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* ── Message list ── */
 .message-list {
   flex: 1;

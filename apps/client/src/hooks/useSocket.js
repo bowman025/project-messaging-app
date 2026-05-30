@@ -3,9 +3,9 @@ import { connectSocket, getSocket } from '../lib/socket.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useMessageStore } from '../store/messageStore.js';
+import { useTypingStore } from '../store/typingStore.js';
 
 export const useSocket = (conversations, activeConversationId) => {
-  const { setOnline, setOffline } = usePresenceStore();
   const conversationsRef = useRef(conversations);
   const activeConversationIdRef = useRef(activeConversationId);
 
@@ -37,6 +37,14 @@ export const useSocket = (conversations, activeConversationId) => {
     socket.on('connect', joinConversations);
     if (socket.connected) joinConversations();
 
+    const handleTypingStart = ({ userId, username, conversationId }) => {
+      useTypingStore.getState().setTyping(conversationId, userId, username);
+    };
+
+    const handleTypingStop = ({ userId, conversationId }) => {
+      useTypingStore.getState().clearTyping(conversationId, userId);
+    };
+
     const handleNewMessage = (message) => {
       useConversationStore.getState().updateLastMessage(message.conversationId, message);
 
@@ -63,9 +71,16 @@ export const useSocket = (conversations, activeConversationId) => {
       }
     };
 
-    const handlePresenceOnline = ({ userId }) => setOnline(userId);
-    const handlePresenceOffline = ({ userId }) => setOffline(userId);
+    const handlePresenceOnline = ({ userId }) => {
+      usePresenceStore.getState().setOnline(userId);
+    };
 
+    const handlePresenceOffline = ({ userId }) => {
+      usePresenceStore.getState().setOffline(userId);
+    };
+
+    socket.on('typing:start', handleTypingStart);
+    socket.on('typing:stop', handleTypingStop);
     socket.on('message:new', handleNewMessage);
     socket.on('message:edited', handleEditedMessage);
     socket.on('message:deleted', handleDeletedMessage);
@@ -74,13 +89,15 @@ export const useSocket = (conversations, activeConversationId) => {
 
     return () => {
       socket.off('connect', joinConversations);
+      socket.off('typing:start', handleTypingStart);
+      socket.off('typing:stop', handleTypingStop);
       socket.off('message:new', handleNewMessage);
       socket.off('message:edited', handleEditedMessage);
       socket.off('message:deleted', handleDeletedMessage);
       socket.off('presence:online', handlePresenceOnline);
       socket.off('presence:offline', handlePresenceOffline);
     };
-  }, [setOnline, setOffline]);
+  }, []);
 
   return getSocket();
 };

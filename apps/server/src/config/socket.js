@@ -66,6 +66,21 @@ export const initSocket = (io) => {
       });
     });
 
+    socket.on('typing:start', ({ conversationId }) => {
+      socket.to(conversationId).emit('typing:start', {
+        userId,
+        username: socket.user.username,
+        conversationId,
+      });
+    });
+
+    socket.on('typing:stop', ({ conversationId }) => {
+      socket.to(conversationId).emit('typing:stop', {
+        userId,
+        conversationId,
+      });
+    });
+
     socket.on('disconnect', () => {
       socket.rooms.forEach((room) => {
         socket.to(room).emit('presence:offline', { userId });

@@ -8,6 +8,7 @@ import { fetchWithAuth } from '../lib/api.js';
 import ConversationHeader from '../components/ConversationHeader.jsx';
 import MessageList from '../components/MessageList.jsx';
 import MessageInput from '../components/MessageInput.jsx';
+import TypingIndicator from '../components/TypingIndicator.jsx';
 
 export default function ConversationPage() {
   const conversation = useLoaderData();
@@ -153,7 +154,8 @@ export default function ConversationPage() {
         hasMore={hasMore}
         containerRef={messageListRef}
       />
-      <MessageInput onSend={handleSend} />
+      <TypingIndicator conversationId={id} />
+      <MessageInput onSend={handleSend} conversationId={id} />
     </div>
   );
 }

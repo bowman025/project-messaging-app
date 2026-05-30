@@ -1,17 +1,49 @@
 import { useState, useRef } from 'react';
 import { uploadImage } from '../lib/upload.js';
+import { getSocket } from '../lib/socket.js';
 
-export default function MessageInput({ onSend }) {
+export default function MessageInput({ onSend, conversationId }) {
   const [content, setContent] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const isTypingRef = useRef(false);
+
+  const emitTypingStart = () => {
+    const socket = getSocket();
+    if (!socket || isTypingRef.current) return;
+    isTypingRef.current = true;
+    socket.emit('typing:start', { conversationId });
+  };
+
+  const emitTypingStop = () => {
+    const socket = getSocket();
+    if (!socket || !isTypingRef.current) return;
+    isTypingRef.current = false;
+    socket.emit('typing:stop', { conversationId });
+  };
+
+  const handleContentChange = (e) => {
+    setContent(e.target.value);
+
+    if (e.target.value.trim()) {
+      emitTypingStart();
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(emitTypingStop, 2000);
+    } else {
+      clearTimeout(typingTimeoutRef.current);
+      emitTypingStop();
+    }
+  };
 
   const handleSubmit = (e) => {
     e?.preventDefault();
     if (!content.trim() && !imageUrl) return;
+    clearTimeout(typingTimeoutRef.current);
+    emitTypingStop();
     onSend({ content: content.trim() || undefined, imageUrl: imageUrl || undefined });
     setContent('');
     setImageUrl(null);
@@ -52,7 +84,7 @@ export default function MessageInput({ onSend }) {
     <div className="message-input-container">
       {imagePreview && (
         <div className="message-image-preview">
-          <img src={imagePreview} alt="Upload preview" />
+          <img src={imagePreview} alt="Attachment" />
           <button onClick={handleRemoveImage} aria-label="Remove image">✕</button>
         </div>
       )}
@@ -77,7 +109,7 @@ export default function MessageInput({ onSend }) {
         <input
           type="text"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={handleContentChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
