@@ -18,7 +18,8 @@ export const initSocket = (io) => {
       try {
         await getConversationById(conversationId, userId);
         socket.join(conversationId);
-      } catch {
+      } catch (err) {
+        console.error(`Error in join:conversation for user ${userId}:`, err);
         socket.emit('error', { message: 'Forbidden' });
       }
     });
@@ -37,6 +38,7 @@ export const initSocket = (io) => {
         socket.to(conversationId).emit('message:new', message);
         socket.emit('message:new', { ...message, tempId });
       } catch (err) {
+        console.error(`Error in message:send for user ${userId}:`, err);
         socket.emit('error', { message: err.message, tempId });
       }
     });
@@ -46,6 +48,7 @@ export const initSocket = (io) => {
         const message = await editMessage(messageId, userId, content);
         io.to(conversationId).emit('message:edited', message);
       } catch (err) {
+        console.error(`Error in message:edit for user ${userId}:`, err);
         socket.emit('error', { message: err.message });
       }
     });
@@ -55,6 +58,7 @@ export const initSocket = (io) => {
         await deleteMessage(messageId, userId);
         io.to(conversationId).emit('message:deleted', { messageId, conversationId });
       } catch (err) {
+        console.error(`Error in message:delete for user ${userId}:`, err);
         socket.emit('error', { message: err.message });
       }
     });
@@ -84,6 +88,7 @@ export const initSocket = (io) => {
     socket.on('disconnect', () => {
       socket.rooms.forEach((room) => {
         socket.to(room).emit('presence:offline', { userId });
+        socket.to(room).emit('typing:stop', { userId, conversationId: room });
       });
     });
   });

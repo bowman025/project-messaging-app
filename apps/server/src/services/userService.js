@@ -2,7 +2,7 @@ import db from '@project-messaging-app/db';
 import { AppError } from '../utils/AppError.js';
 
 export const findUserByEmail = async (email) => {
-  return db.user.findUnique({ where: { email } });
+  return db.user.findUnique({ where: { email: email.toLowerCase() } });
 };
 
 export const findUserById = async (id) => {

@@ -21,11 +21,11 @@ export const register = async (req, res, next) => {
 
     const { username, email, password } = parsed.data;
 
-    const existing = await findUserByEmail(email);
+    const existing = await findUserByEmail(email.toLowerCase());
     if (existing) throw new AppError('Email already in use', 409);
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await createUser({ username, email, passwordHash });
+    const user = await createUser({ username, email: email.toLowerCase(), passwordHash });
 
     const token = signToken(user.id);
 
