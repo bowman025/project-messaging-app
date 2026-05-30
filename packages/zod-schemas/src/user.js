@@ -7,8 +7,12 @@ export const registerSchema = z
       .min(3, 'Username must be at least 3 characters')
       .max(32, 'Username must be at most 32 characters')
       .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers and underscores'),
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
+    email: z.string().email('Invalid email address').toLowerCase(),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -17,7 +21,7 @@ export const registerSchema = z
   });
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Invalid email address').toLowerCase(),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -26,9 +30,13 @@ export const updateProfileSchema = z.object({
     .string()
     .min(3)
     .max(32)
+    .trim()
     .regex(/^[a-zA-Z0-9_]+$/)
     .optional(),
-  avatarUrl: z.string().url('Invalid URL').optional(),
-  bio: z.string().max(160, 'Bio must be at most 160 characters').optional(),
+  avatarUrl: z
+    .string()
+    .url('Invalid avatar image URL')
+    .regex(/\.(jpg|jpeg|png|gif|webp|avif)(\?.*)?$/i, 'Must be a valid avatar image URL')
+    .optional(),
+  bio: z.string().max(160, 'Bio must be at most 160 characters').trim().optional(),
 });
-
