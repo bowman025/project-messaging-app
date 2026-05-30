@@ -22,7 +22,7 @@ export const uploadImage = async (file, type) => {
   formData.append('signature', signature);
   formData.append('timestamp', timestamp);
   formData.append('folder', folder);
-  formData.append('allowed_formats', 'jpg,jpeg,png,webp,gif');
+  formData.append('allowed_formats', 'jpg,jpeg,png,webp,gif,avif');
   formData.append('api_key', apiKey);
 
   const uploadRes = await fetch(
