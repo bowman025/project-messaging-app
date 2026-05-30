@@ -1,6 +1,6 @@
 import { fetchWithAuth } from './api.js';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 const MAX_SIZE_MB = 5;
 
 export const uploadImage = async (file, type) => {
