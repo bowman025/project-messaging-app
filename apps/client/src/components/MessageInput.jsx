@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { uploadImage } from '../lib/upload.js';
 import { getSocket } from '../lib/socket.js';
 
@@ -79,6 +79,12 @@ export default function MessageInput({ onSend, conversationId }) {
   };
 
   const canSend = (content.trim() || imageUrl) && !isUploading;
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(typingTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <div className="message-input-container">

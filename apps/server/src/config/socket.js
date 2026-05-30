@@ -8,7 +8,6 @@ export const initSocket = (io) => {
   io.on('connection', (socket) => {
     const userId = socket.user.id;
 
-
     socket.on('join:conversations', async (conversationIds) => {
       if (!Array.isArray(conversationIds)) return;
       conversationIds.forEach((id) => socket.join(id));
@@ -85,11 +84,19 @@ export const initSocket = (io) => {
       });
     });
 
-    socket.on('disconnect', () => {
-      socket.rooms.forEach((room) => {
-        socket.to(room).emit('presence:offline', { userId });
-        socket.to(room).emit('typing:stop', { userId, conversationId: room });
-      });
+    socket.on('disconnecting', () => {
+      for (const room of socket.rooms) {
+        if (room === socket.id) continue;
+
+        socket.to(room).emit('typing:stop', {
+          userId,
+          conversationId: room,
+        });
+
+        socket.to(room).emit('presence:offline', {
+          userId,
+        });
+      }
     });
   });
 };

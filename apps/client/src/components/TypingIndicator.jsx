@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 export default function TypingIndicator({ conversationId }) {
   const typingUsers = useTypingStore(
     (state) => state.typingUsers[conversationId],
-    (a, b) => a === b // Shallow comparison
+    (a, b) => a === b
   );
   const currentUserId = useAuthStore((state) => state.user?.id);
 
