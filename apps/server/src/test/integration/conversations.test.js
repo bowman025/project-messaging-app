@@ -7,8 +7,8 @@ const app = createTestApp();
 
 describe('GET /api/conversations', () => {
   it('returns conversations for authenticated user', async () => {
-    const user = await createTestUser({ email: 'user1@example.com' });
-    const other = await createTestUser({ email: 'user2@example.com', username: 'user2' });
+    const user = await createTestUser();
+    const other = await createTestUser();
     await createTestConversation([user.id, other.id]);
     const token = getAuthToken(user.id);
 
@@ -28,8 +28,8 @@ describe('GET /api/conversations', () => {
 
 describe('POST /api/conversations', () => {
   it('creates a DM conversation', async () => {
-    const user = await createTestUser({ email: 'user3@example.com', username: 'user3' });
-    const other = await createTestUser({ email: 'user4@example.com', username: 'user4' });
+    const user = await createTestUser();
+    const other = await createTestUser();
     const token = getAuthToken(user.id);
 
     const res = await request(app)
@@ -42,8 +42,8 @@ describe('POST /api/conversations', () => {
   });
 
   it('prevents duplicate DM conversations', async () => {
-    const user = await createTestUser({ email: 'user5@example.com', username: 'user5' });
-    const other = await createTestUser({ email: 'user6@example.com', username: 'user6' });
+    const user = await createTestUser();
+    const other = await createTestUser();
     await createTestConversation([user.id, other.id]);
     const token = getAuthToken(user.id);
 
@@ -56,9 +56,9 @@ describe('POST /api/conversations', () => {
   });
 
   it('creates a group conversation', async () => {
-    const user = await createTestUser({ email: 'user7@example.com', username: 'user7' });
-    const other1 = await createTestUser({ email: 'user8@example.com', username: 'user8' });
-    const other2 = await createTestUser({ email: 'user9@example.com', username: 'user9' });
+    const user = await createTestUser();
+    const other1 = await createTestUser();
+    const other2 = await createTestUser();
     const token = getAuthToken(user.id);
 
     const res = await request(app)
@@ -74,8 +74,8 @@ describe('POST /api/conversations', () => {
 
 describe('POST /api/conversations/:id/messages', () => {
   it('sends a message in a conversation', async () => {
-    const user = await createTestUser({ email: 'user10@example.com', username: 'user10' });
-    const other = await createTestUser({ email: 'user11@example.com', username: 'user11' });
+    const user = await createTestUser();
+    const other = await createTestUser();
     const conversation = await createTestConversation([user.id, other.id]);
     const token = getAuthToken(user.id);
 
@@ -90,9 +90,9 @@ describe('POST /api/conversations/:id/messages', () => {
   });
 
   it('returns 403 for non-members', async () => {
-    const user = await createTestUser({ email: 'user12@example.com', username: 'user12' });
-    const other1 = await createTestUser({ email: 'user13@example.com', username: 'user13' });
-    const other2 = await createTestUser({ email: 'user14@example.com', username: 'user14' });
+    const user = await createTestUser();
+    const other1 = await createTestUser();
+    const other2 = await createTestUser();
     const conversation = await createTestConversation([other1.id, other2.id]);
     const token = getAuthToken(user.id);
 

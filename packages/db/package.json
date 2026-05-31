@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/client.js",
-    "./client": "./generated/prisma/client.js",
-    "./testClient": "./src/testClient.js"
+    "./client": "./generated/prisma/client.js"
   },
   "scripts": {
     "db:generate": "prisma generate",

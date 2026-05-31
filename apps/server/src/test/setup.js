@@ -1,13 +1,8 @@
 import 'dotenv/config';
 import { execSync } from 'child_process';
-import { PrismaClient } from '@project-messaging-app/db/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import db from '@project-messaging-app/db';
 
-const adapter = new PrismaPg({
-  connectionString: process.env.TEST_DATABASE_URL,
-});
-
-export const testDb = new PrismaClient({ adapter });
+export const testDb = db;
 
 beforeAll(async () => {
   execSync('npx prisma migrate deploy', {
