@@ -7,8 +7,8 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       username: 'testuser',
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123',
+      confirmPassword: 'Password123',
     });
     expect(result.success).toBe(true);
   });
@@ -17,7 +17,7 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       username: 'testuser',
       email: 'test@example.com',
-      password: 'password123',
+      password: 'Password123',
       confirmPassword: 'different',
     });
     expect(result.success).toBe(false);
@@ -27,8 +27,8 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       username: 'testuser',
       email: 'notanemail',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123',
+      confirmPassword: 'Password123',
     });
     expect(result.success).toBe(false);
   });
@@ -37,8 +37,8 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       username: 'ab',
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123',
+      confirmPassword: 'Password123',
     });
     expect(result.success).toBe(false);
   });
@@ -47,8 +47,8 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       username: 'test user!',
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123',
+      confirmPassword: 'Password123',
     });
     expect(result.success).toBe(false);
   });
@@ -58,7 +58,7 @@ describe('loginSchema', () => {
   it('accepts valid login data', () => {
     const result = loginSchema.safeParse({
       email: 'test@example.com',
-      password: 'password123',
+      password: 'Password123',
     });
     expect(result.success).toBe(true);
   });
@@ -74,7 +74,7 @@ describe('loginSchema', () => {
   it('rejects invalid email', () => {
     const result = loginSchema.safeParse({
       email: 'notanemail',
-      password: 'password123',
+      password: 'Password123',
     });
     expect(result.success).toBe(false);
   });

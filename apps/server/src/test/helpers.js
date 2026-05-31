@@ -3,14 +3,21 @@ import jwt from 'jsonwebtoken';
 import { testDb } from './setup.js';
 import { env } from '../config/env.js';
 
+let userCount = 0;
+
 export const createTestUser = async ({
-  username = 'testuser',
+  username,
   email = 'test@example.com',
-  password = 'password123',
+  password = 'Password123',
 } = {}) => {
+  userCount++;
   const passwordHash = await bcrypt.hash(password, 10);
   return testDb.user.create({
-    data: { username, email, passwordHash },
+    data: {
+      username: username ?? `testuser${userCount}`,
+      email,
+      passwordHash,
+    },
   });
 };
 

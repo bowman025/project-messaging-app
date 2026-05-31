@@ -12,8 +12,8 @@ describe('POST /api/auth/register', () => {
       .send({
         username: 'newuser',
         email: 'new@example.com',
-        password: 'password123',
-        confirmPassword: 'password123',
+        password: 'Password123',
+        confirmPassword: 'Password123',
       });
 
     expect(res.status).toBe(201);
@@ -31,8 +31,8 @@ describe('POST /api/auth/register', () => {
       .send({
         username: 'newuser',
         email: 'existing@example.com',
-        password: 'password123',
-        confirmPassword: 'password123',
+        password: 'Password123',
+        confirmPassword: 'Password123',
       });
 
     expect(res.status).toBe(409);
@@ -56,12 +56,12 @@ describe('POST /api/auth/login', () => {
   it('logs in with valid credentials', async () => {
     await createTestUser({
       email: 'login@example.com',
-      password: 'password123',
+      password: 'Password123',
     });
 
     const res = await request(app)
       .post('/api/auth/login')
-      .send({ email: 'login@example.com', password: 'password123' });
+      .send({ email: 'login@example.com', password: 'Password123' });
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('success');
@@ -81,7 +81,7 @@ describe('POST /api/auth/login', () => {
   it('rejects unknown email', async () => {
     const res = await request(app)
       .post('/api/auth/login')
-      .send({ email: 'nobody@example.com', password: 'password123' });
+      .send({ email: 'nobody@example.com', password: 'Password123' });
 
     expect(res.status).toBe(401);
   });

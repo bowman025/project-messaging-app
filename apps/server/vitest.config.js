@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./src/test/setup.js'],
+    setupFiles: ['./src/test/preload.js', './src/test/setup.js'],
     coverage: {
       reporter: ['text', 'html'],
       include: ['src/**/*.js'],
