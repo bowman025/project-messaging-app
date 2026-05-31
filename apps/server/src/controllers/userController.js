@@ -1,6 +1,8 @@
 import { findUsersByUsername, updateUser } from '../services/userService.js';
 import { updateProfileSchema } from '@project-messaging-app/zod-schemas/user';
 import { AppError } from '../utils/AppError.js';
+import cloudinary from '../config/cloudinary.js';
+import { extractPublicId } from '../utils/cloudinaryUtils.js';
 
 export const searchUsers = async (req, res, next) => {
   try {
@@ -36,13 +38,24 @@ export const patchProfile = async (req, res, next) => {
       if (exact) throw new AppError('Username already taken', 409);
     }
 
+    if (avatarUrl && req.user.avatarUrl && avatarUrl !== req.user.avatarUrl) {
+      const publicId = extractPublicId(req.user.avatarUrl);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (_err) {
+          console.error('Failed to delete old avatar from Cloudinary:', publicId);
+        }
+      }
+    }
+
     const user = await updateUser(req.user.id, {
       ...(username && { username }),
       ...(avatarUrl !== undefined && { avatarUrl }),
       ...(bio !== undefined && { bio }),
     });
 
-    const { _passwordHash, ...rest } = user;
+    const { passwordHash: _passwordHash, ...rest } = user;
     res.json({ status: 'success', user: rest });
   } catch (err) {
     next(err);

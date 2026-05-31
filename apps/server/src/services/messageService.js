@@ -1,20 +1,7 @@
 import db from '@project-messaging-app/db';
 import { AppError } from '../utils/AppError.js';
 import cloudinary from '../config/cloudinary.js';
-
-const extractPublicId = (imageUrl) => {
-  try {
-    const url = new URL(imageUrl);
-    const parts = url.pathname.split('/');
-    const uploadIndex = parts.indexOf('upload');
-    if (uploadIndex === -1) return null;
-    const relevantParts = parts.slice(uploadIndex + 2);
-    const withoutExtension = relevantParts.join('/').replace(/\.[^/.]+$/, '');
-    return withoutExtension;
-  } catch {
-    return null;
-  }
-};
+import { extractPublicId } from '../utils/cloudinaryUtils.js';
 
 export const getMessagesByConversationId = async (conversationId, cursor = null, limit = 30) => {
   let cursorDate = null;
