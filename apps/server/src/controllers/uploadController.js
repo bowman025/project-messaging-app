@@ -1,4 +1,5 @@
 import cloudinary from '../config/cloudinary.js';
+import { env } from '../config/env.js';
 
 const FOLDERS = {
   avatar: 'messaging-app/avatars',
@@ -25,7 +26,7 @@ export const getUploadSignature = (req, res) => {
 
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
-    process.env.CLOUDINARY_API_SECRET
+    env.CLOUDINARY_API_SECRET
   );
 
   res.json({
@@ -33,7 +34,7 @@ export const getUploadSignature = (req, res) => {
     signature,
     timestamp,
     folder,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: env.CLOUDINARY_CLOUD_NAME,
+    apiKey: env.CLOUDINARY_API_KEY,
   });
 };

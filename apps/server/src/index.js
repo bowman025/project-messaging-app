@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { env } from './config/env.js';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -17,9 +18,9 @@ import { authLimiter, apiLimiter, uploadLimiter } from './config/rateLimiter.js'
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: process.env.CLIENT_URL },
+  cors: { origin: env.CLIENT_URL },
 });
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -33,8 +34,8 @@ app.use(helmet({
         "https://api.cloudinary.com",
         "wss:",
         "ws:",
-        ...(process.env.NODE_ENV === 'production'
-          ? [process.env.CLIENT_URL]
+        ...(env.NODE_ENV === 'production'
+          ? [env.CLIENT_URL]
           : ["http://localhost:5173", "ws://localhost:5173"]
         ),
       ],
@@ -46,7 +47,7 @@ app.use(helmet({
   },
   crossOriginEmbedderPolicy: false,
 }));
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());

@@ -1,4 +1,6 @@
+import { env } from './env.js';
+
 export const jwtConfig = {
-  secret: process.env.JWT_SECRET,
+  secret: env.JWT_SECRET,
   expiresIn: '7d',
 };
