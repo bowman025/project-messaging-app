@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/client.js"
+    ".": "./src/client.js",
+    "./client": "./generated/prisma/client.js"
   },
   "scripts": {
     "db:generate": "prisma generate",

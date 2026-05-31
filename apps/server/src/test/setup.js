@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { PrismaClient } from '../../../packages/db/generated/prisma/client.js';
+import { PrismaClient } from '@project-messaging-app/db/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const adapter = new PrismaPg({
