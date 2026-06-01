@@ -8,7 +8,13 @@ export default function ConversationHeader({ conversation }) {
 
   const getOtherUser = () => {
     if (conversation.isGroup) return null;
-    return conversation.participants.find((p) => p.user.id !== user?.id)?.user ?? null;
+    const found = conversation.participants.find((p) => {
+      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
+      return id !== user?.id;
+    });
+    if (!found) return null;
+    if (typeof found === 'string') return { id: found, username: 'Unknown' };
+    return found.user ?? found;
   };
 
   const getName = () => {
@@ -19,7 +25,10 @@ export default function ConversationHeader({ conversation }) {
 
   const getSubtitle = () => {
     if (conversation.isGroup) {
-      return conversation.participants.map((p) => p.user.username).join(', ');
+      return conversation.participants
+        .map((p) => (typeof p === 'string' ? null : p.user?.username ?? p.username))
+        .filter(Boolean)
+        .join(', ');
     }
     const other = getOtherUser();
     if (!other) return null;

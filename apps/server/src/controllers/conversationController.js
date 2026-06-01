@@ -5,6 +5,7 @@ import {
   deleteConversation,
   leaveConversation,
 } from '../services/conversationService.js';
+import { getIO } from '../config/socket.js';
 import { getMessagesByConversationId } from '../services/messageService.js';
 import { AppError } from '../utils/AppError.js';
 import { createConversationSchema } from '@project-messaging-app/zod-schemas/conversation';
@@ -78,6 +79,20 @@ export const postConversation = async (req, res, next) => {
       creatorId: req.user.id,
     });
 
+    try {
+      const io = getIO();
+      if (io && io.sockets && io.sockets.sockets) {
+        for (const socket of io.sockets.sockets.values()) {
+          const sidUserId = socket.user?.id;
+          if (sidUserId && sidUserId !== req.user.id && allParticipantIds.includes(sidUserId)) {
+            socket.emit('conversation:new', conversation);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to emit conversation:new to participants', err);
+    }
+
     res.status(201).json({ status: 'success', conversation });
   } catch (err) {
     next(err);
@@ -86,7 +101,28 @@ export const postConversation = async (req, res, next) => {
 
 export const removeConversation = async (req, res, next) => {
   try {
+
+    const conversation = await getConversationById(req.params.id, req.user.id);
     await deleteConversation(req.params.id, req.user.id);
+
+    try {
+      const io = getIO();
+      if (io) {
+        io.to(req.params.id).emit('conversation:deleted', { conversationId: req.params.id, deletedBy: req.user.id });
+        if (conversation?.participants?.length) {
+          const participantIds = conversation.participants.map((p) => p.user?.id ?? p.userId ?? p.id).filter(Boolean);
+          for (const socket of io.sockets.sockets.values()) {
+            const sidUserId = socket.user?.id;
+            if (sidUserId && participantIds.includes(sidUserId)) {
+              socket.emit('conversation:deleted', { conversationId: req.params.id, deletedBy: req.user.id });
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to emit conversation:deleted', err);
+    }
+
     res.status(204).send();
   } catch (err) {
     next(err);

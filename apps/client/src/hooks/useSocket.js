@@ -28,14 +28,6 @@ export const useSocket = (conversations, activeConversationId) => {
 
     const previousId = previousConversationIdRef.current;
 
-    if (previousId && previousId !== activeConversationId) {
-      const conversations = useConversationStore.getState().conversations;
-      const stillExists = conversations.some((c) => c.id === previousId);
-      if (stillExists) {
-        socket.emit('leave:conversation', { conversationId: previousId });
-      }
-    }
-
     if (activeConversationId && previousId !== activeConversationId) {
       socket.emit('join:conversation', activeConversationId);
     }
@@ -137,12 +129,32 @@ export const useSocket = (conversations, activeConversationId) => {
       usePresenceStore.getState().setOffline(userId);
     };
 
+    const handleConversationDeleted = ({ conversationId }) => {
+      useConversationStore.getState().removeConversation(conversationId);
+    };
+
     const handleParticipantLeft = ({ conversationId, userId, deleted }) => {
-      console.warn('conversation:participant_left received', { conversationId, userId, deleted });
+
       if (deleted) {
         useConversationStore.getState().removeConversation(conversationId);
       } else {
         useConversationStore.getState().removeParticipant(conversationId, userId);
+      }
+    };
+
+    const handleNewConversation = (conversation) => {
+      try {
+        const store = useConversationStore.getState();
+        const exists = store.conversations.some((c) => c.id === conversation.id);
+        if (!exists) {
+          store.addConversation(conversation);
+        }
+        const s = getSocket();
+        if (s?.connected) {
+          s.emit('join:conversation', conversation.id);
+        }
+      } catch (err) {
+        console.error('Error handling conversation:new', err);
       }
     };
 
@@ -159,6 +171,8 @@ export const useSocket = (conversations, activeConversationId) => {
     socket.on('presence:offline', handlePresenceOffline);
 
     socket.on('conversation:participant_left', handleParticipantLeft);
+    socket.on('conversation:new', handleNewConversation);
+    socket.on('conversation:deleted', handleConversationDeleted);
 
     if (socket.connected) {
       joinRooms();
@@ -178,6 +192,8 @@ export const useSocket = (conversations, activeConversationId) => {
       socket.off('presence:offline', handlePresenceOffline);
 
       socket.off('conversation:participant_left', handleParticipantLeft);
+      socket.off('conversation:new', handleNewConversation);
+      socket.off('conversation:deleted', handleConversationDeleted);
     };
   }, []);
 

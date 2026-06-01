@@ -1,8 +1,12 @@
 import { socketAuthenticate } from '../middleware/socketAuthenticate.js';
+let ioInstance = null;
+
+export const getIO = () => ioInstance;
 import { createMessage, editMessage, deleteMessage } from '../services/messageService.js';
 import { getConversationById, leaveConversation } from '../services/conversationService.js';
 
 export const initSocket = (io) => {
+  ioInstance = io;
   io.use(socketAuthenticate);
 
   io.on('connection', (socket) => {

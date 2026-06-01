@@ -1,4 +1,4 @@
-import { useLoaderData, useParams } from 'react-router';
+import { useLoaderData, useParams, useNavigate } from 'react-router';
 import { useEffect, useRef, useCallback } from 'react';
 import { useMessageStore } from '../store/messageStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
@@ -13,6 +13,23 @@ import TypingIndicator from '../components/TypingIndicator.jsx';
 export default function ConversationPage() {
   const conversation = useLoaderData();
   const { id } = useParams();
+  const storeConversation = useConversationStore((state) =>
+    state.conversations.find((c) => c.id === id)
+  );
+  const displayedConversation = {
+    ...conversation,
+    participants: storeConversation?.participants ?? conversation.participants,
+    name: storeConversation?.name ?? conversation.name,
+    updatedAt: storeConversation?.updatedAt ?? conversation.updatedAt,
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!storeConversation) {
+      navigate('/conversations');
+    }
+  }, [storeConversation, navigate]);
   const messages = useMessageStore((state) => state.messages);
   const nextCursor = useMessageStore((state) => state.nextCursor);
   const hasMore = useMessageStore((state) => state.hasMore);
@@ -143,7 +160,7 @@ export default function ConversationPage() {
 
   return (
     <div className="conversation-page">
-      <ConversationHeader conversation={conversation} />
+      <ConversationHeader conversation={displayedConversation} />
       <MessageList
         messages={messages}
         currentUserId={user?.id}

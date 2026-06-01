@@ -7,9 +7,13 @@ export const useConversationStore = create((set) => ({
   setConversations: (conversations) => set({ conversations }),
 
   addConversation: (conversation) =>
-    set((state) => ({
-      conversations: [conversation, ...state.conversations],
-    })),
+    set((state) => {
+      const exists = state.conversations.some((c) => c.id === conversation.id);
+      if (exists) return {};
+      return {
+        conversations: [conversation, ...state.conversations],
+      };
+    }),
 
   removeConversation: (id) =>
     set((state) => ({
@@ -20,26 +24,24 @@ export const useConversationStore = create((set) => ({
     })),
 
   removeParticipant: (conversationId, userId) => {
-    console.warn('removeParticipant called', { conversationId, userId });
     set((state) => {
-      const conversation = state.conversations.find((c) => c.id === conversationId);
-      console.warn(
-        'conversation found:',
-        conversation?.id,
-        'participants:',
-        conversation?.participants?.map((p) => p.user?.id ?? p.userId)
+      const normalize = (p) => {
+        if (p == null) return null;
+        if (typeof p === 'string') return p;
+        return String(p.user?.id ?? p.userId ?? p.id ?? null);
+      };
+
+      const updated = state.conversations.map((c) =>
+        c.id === conversationId
+          ? {
+            ...c,
+            participants: c.participants.filter((p) => normalize(p) !== String(userId)),
+          }
+          : c
       );
+
       return {
-        conversations: state.conversations.map((c) =>
-          c.id === conversationId
-            ? {
-              ...c,
-              participants: c.participants.filter(
-                (p) => String(p.user?.id ?? p.userId) !== String(userId)
-              ),
-            }
-            : c
-        ),
+        conversations: updated,
       };
     });
   },

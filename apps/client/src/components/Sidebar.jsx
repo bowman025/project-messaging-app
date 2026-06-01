@@ -10,11 +10,12 @@ import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
 import Avatar from './Avatar.jsx';
 
-export default function Sidebar({ conversations }) {
+export default function Sidebar() {
   const navigate = useNavigate();
   const { id: activeId } = useParams();
   const { user, clearAuth } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
+  const conversations = useConversationStore((state) => state.conversations);
   const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
@@ -53,13 +54,24 @@ export default function Sidebar({ conversations }) {
 
   const getOtherUser = (conversation) => {
     if (conversation.isGroup) return null;
-    return conversation.participants.find((p) => p.user.id !== user?.id)?.user ?? null;
+    const findOther = conversation.participants.find((p) => {
+      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
+      return id !== user?.id;
+    });
+    if (!findOther) return null;
+    if (typeof findOther === 'string') return { id: findOther, username: 'Unknown' };
+    return findOther.user ?? findOther;
   };
 
   const getConversationName = (conversation) => {
     if (conversation.name) return conversation.name;
-    const other = conversation.participants.find((p) => p.user.id !== user?.id);
-    return other?.user.username ?? 'Unknown';
+    const other = conversation.participants.find((p) => {
+      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
+      return id !== user?.id;
+    });
+    if (!other) return 'Unknown';
+    if (typeof other === 'string') return 'Unknown';
+    return other?.user?.username ?? other?.username ?? 'Unknown';
   };
 
   const getLastMessage = (conversation) => {
@@ -71,9 +83,10 @@ export default function Sidebar({ conversations }) {
 
   const isConversationOnline = (conversation) => {
     if (conversation.isGroup) return false;
-    return conversation.participants.some(
-      (p) => p.user.id !== user?.id && onlineUsers.has(p.user.id)
-    );
+    return conversation.participants.some((p) => {
+      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
+      return id !== user?.id && onlineUsers.has(id);
+    });
   };
 
   return (
