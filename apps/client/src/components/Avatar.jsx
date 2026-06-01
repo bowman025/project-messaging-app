@@ -1,4 +1,8 @@
+import { useState } from 'react';
+
 export default function Avatar({ user, size = 'md' }) {
+  const [imgError, setImgError] = useState(false);
+
   const initials = user?.username
     ? user.username.slice(0, 2).toUpperCase()
     : '??';
@@ -12,16 +16,16 @@ export default function Avatar({ user, size = 'md' }) {
     (user?.username?.charCodeAt(0) ?? 0) % colors.length
   ];
 
-  if (user?.avatarUrl) {
+  const showImage = user?.avatarUrl && !imgError;
+
+  if (showImage) {
     return (
       <img
         src={user.avatarUrl}
-        alt={user.username}
+        alt={user?.username}
         className={`avatar avatar--${size}`}
-        onError={(e) => {
-          e.target.style.display = 'none';
-          e.target.nextSibling.style.display = 'flex';
-        }}
+        onError={() => setImgError(true)}
+        onLoad={() => setImgError(false)}
       />
     );
   }

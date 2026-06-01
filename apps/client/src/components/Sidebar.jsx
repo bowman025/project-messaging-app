@@ -9,6 +9,11 @@ import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
 import Avatar from './Avatar.jsx';
+import {
+  getOtherUser,
+  getConversationName,
+  isConversationOnline,
+} from '../utils/participants.js';
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -52,27 +57,6 @@ export default function Sidebar() {
     if (activeId === conversationId) navigate('/conversations');
   };
 
-  const getOtherUser = (conversation) => {
-    if (conversation.isGroup) return null;
-    const findOther = conversation.participants.find((p) => {
-      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
-      return id !== user?.id;
-    });
-    if (!findOther) return null;
-    if (typeof findOther === 'string') return { id: findOther, username: 'Unknown' };
-    return findOther.user ?? findOther;
-  };
-
-  const getConversationName = (conversation) => {
-    if (conversation.name) return conversation.name;
-    const other = conversation.participants.find((p) => {
-      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
-      return id !== user?.id;
-    });
-    if (!other) return 'Unknown';
-    if (typeof other === 'string') return 'Unknown';
-    return other?.user?.username ?? other?.username ?? 'Unknown';
-  };
 
   const getLastMessage = (conversation) => {
     const msg = conversation.messages?.[0];
@@ -81,13 +65,9 @@ export default function Sidebar() {
     return msg.content.length > 40 ? msg.content.slice(0, 40) + '...' : msg.content;
   };
 
-  const isConversationOnline = (conversation) => {
-    if (conversation.isGroup) return false;
-    return conversation.participants.some((p) => {
-      const id = typeof p === 'string' ? p : p.user?.id ?? p.userId ?? p.id;
-      return id !== user?.id && onlineUsers.has(id);
-    });
-  };
+  const otherUserForAvatar = (conversation) => getOtherUser(conversation, user?.id);
+  const nameForConversation = (conversation) => getConversationName(conversation, user?.id);
+  const conversationOnline = (conversation) => isConversationOnline(conversation, user?.id, onlineUsers);
 
   return (
     <aside className="sidebar">
@@ -116,13 +96,13 @@ export default function Sidebar() {
             }
           >
             <Avatar
-              user={conversation.isGroup ? null : getOtherUser(conversation)}
+              user={conversation.isGroup ? null : otherUserForAvatar(conversation)}
               size="md"
             />
             <div className="conversation-info">
               <div className="conversation-name">
-                {getConversationName(conversation)}
-                {isConversationOnline(conversation) && (
+                {nameForConversation(conversation)}
+                {conversationOnline(conversation) && (
                   <span className="online-indicator" />
                 )}
               </div>
