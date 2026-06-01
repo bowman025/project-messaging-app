@@ -17,17 +17,20 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  participants Participant[]
-  messages     Message[]
+  participants  Participant[]
+  messages      Message[]
+  conversations Conversation[] @relation("ConversationCreator")
 }
 
 model Conversation {
   id        String   @id @default(cuid(2))
   name      String?
   isGroup   Boolean  @default(false)
+  creatorId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  creator      User?         @relation("ConversationCreator", fields: [creatorId], references: [id], onDelete: SetNull)
   participants Participant[]
   messages     Message[]
 }
