@@ -26,7 +26,7 @@ export default function ProfilePage() {
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       username: user?.username ?? '',
-      avatarUrl: user?.avatarUrl ?? '',
+      avatarUrl: user?.avatarUrl ?? undefined,
       bio: user?.bio ?? '',
     },
   });
@@ -57,20 +57,25 @@ export default function ProfilePage() {
 
   const onSubmit = async (data) => {
     setSuccess(false);
+
+    const payload = { ...data };
+    if (!payload.avatarUrl) delete payload.avatarUrl;
+
     try {
       const res = await fetchWithAuth('/api/users/profile', {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const json = await res.json();
 
       if (!res.ok) {
-        setError('root', { message: json.message });
+        setError('root', { message: json.message || 'Failed to update profile' });
         return;
       }
 
       setUser(json.user);
+      setAvatarPreview(json.user?.avatarUrl ?? avatarPreview);
       setSuccess(true);
     } catch (_err) {
       setError('root', { message: 'Something went wrong. Please try again.' });
