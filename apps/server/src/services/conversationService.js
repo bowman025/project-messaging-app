@@ -53,11 +53,12 @@ export const getConversationById = async (id, userId, cursor = null, limit = 30)
   };
 };
 
-export const createConversation = async ({ participantIds, name, isGroup }) => {
+export const createConversation = async ({ participantIds, name, isGroup, creatorId }) => {
   return db.conversation.create({
     data: {
       name,
-      isGroup: isGroup ?? participantIds.length > 1,
+      isGroup: isGroup ?? participantIds.length > 2,
+      creatorId,
       participants: {
         create: participantIds.map((userId) => ({ userId })),
       },
@@ -77,9 +78,35 @@ export const deleteConversation = async (id, userId) => {
   });
 
   if (!conversation) throw new AppError('Conversation not found', 404);
-
-  const isMember = conversation.participants.some((p) => p.userId === userId);
-  if (!isMember) throw new AppError('Forbidden', 403);
+  if (conversation.creatorId !== userId) throw new AppError('Only the creator can delete this conversation', 403);
 
   return db.conversation.delete({ where: { id } });
+};
+
+export const leaveConversation = async (id, userId) => {
+  const conversation = await db.conversation.findUnique({
+    where: { id },
+    include: { participants: true },
+  });
+
+  if (!conversation) throw new AppError('Conversation not found', 404);
+
+  const isMember = conversation.participants.some((p) => p.userId === userId);
+  if (!isMember) throw new AppError('You are not a member of this conversation', 403);
+
+  if (conversation.creatorId === userId) {
+    throw new AppError('Creators cannot leave — delete the conversation instead', 403);
+  }
+
+  await db.participant.deleteMany({
+    where: { conversationId: id, userId },
+  });
+
+  const remaining = conversation.participants.filter((p) => p.userId !== userId);
+  if (remaining.length === 0) {
+    await db.conversation.delete({ where: { id } });
+    return { deleted: true };
+  }
+
+  return { deleted: false };
 };

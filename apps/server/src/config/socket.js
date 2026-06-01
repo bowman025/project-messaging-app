@@ -1,6 +1,6 @@
 import { socketAuthenticate } from '../middleware/socketAuthenticate.js';
 import { createMessage, editMessage, deleteMessage } from '../services/messageService.js';
-import { getConversationById } from '../services/conversationService.js';
+import { getConversationById, leaveConversation } from '../services/conversationService.js';
 
 export const initSocket = (io) => {
   io.use(socketAuthenticate);
@@ -20,6 +20,26 @@ export const initSocket = (io) => {
       } catch (err) {
         console.error(`Error in join:conversation for user ${userId}:`, err);
         socket.emit('error', { message: 'Forbidden' });
+      }
+    });
+
+    socket.on('conversation:leave', async ({ conversationId }) => {
+      try {
+        const result = await leaveConversation(conversationId, userId);
+
+        // notify remaining participants
+        socket.to(conversationId).emit('conversation:participant_left', {
+          conversationId,
+          userId,
+          deleted: result.deleted,
+        });
+
+        // leave the socket room
+        socket.leave(conversationId);
+
+        socket.emit('conversation:left', { conversationId, deleted: result.deleted });
+      } catch (err) {
+        socket.emit('error', { message: err.message });
       }
     });
 

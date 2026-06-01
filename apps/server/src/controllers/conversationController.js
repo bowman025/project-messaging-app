@@ -3,6 +3,7 @@ import {
   getConversationById,
   createConversation,
   deleteConversation,
+  leaveConversation,
 } from '../services/conversationService.js';
 import { getMessagesByConversationId } from '../services/messageService.js';
 import { AppError } from '../utils/AppError.js';
@@ -74,6 +75,7 @@ export const postConversation = async (req, res, next) => {
       participantIds: allParticipantIds,
       name,
       isGroup: allParticipantIds.length > 2,
+      creatorId: req.user.id,
     });
 
     res.status(201).json({ status: 'success', conversation });
@@ -86,6 +88,15 @@ export const removeConversation = async (req, res, next) => {
   try {
     await deleteConversation(req.params.id, req.user.id);
     res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const leave = async (req, res, next) => {
+  try {
+    const result = await leaveConversation(req.params.id, req.user.id);
+    res.json({ status: 'success', deleted: result.deleted });
   } catch (err) {
     next(err);
   }
