@@ -23,20 +23,25 @@ export const initSocket = (io) => {
       }
     });
 
-    socket.on('conversation:leave', async ({ conversationId }) => {
+    socket.on('leave:conversation', async (payload) => {
+      const conversationId =
+        typeof payload === 'string' ? payload : payload?.conversationId;
+
+      if (!conversationId) {
+        socket.emit('error', { message: 'Missing conversationId' });
+        return;
+      }
+
       try {
         const result = await leaveConversation(conversationId, userId);
 
-        // notify remaining participants
         socket.to(conversationId).emit('conversation:participant_left', {
           conversationId,
           userId,
           deleted: result.deleted,
         });
 
-        // leave the socket room
         socket.leave(conversationId);
-
         socket.emit('conversation:left', { conversationId, deleted: result.deleted });
       } catch (err) {
         socket.emit('error', { message: err.message });

@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { fetchWithAuth } from '../lib/api.js';
-import { disconnectSocket } from '../lib/socket.js';
+import { getSocket, disconnectSocket } from '../lib/socket.js';
 import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import { useTheme } from '../hooks/useTheme.js';
@@ -38,6 +38,17 @@ export default function Sidebar({ conversations }) {
       removeConversation(conversationId);
       if (activeId === conversationId) navigate('/conversations');
     }
+  };
+
+  const handleLeave = async (e, conversationId) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const socket = getSocket();
+    if (socket) socket.emit('leave:conversation', { conversationId });
+
+    removeConversation(conversationId);
+    if (activeId === conversationId) navigate('/conversations');
   };
 
   const getOtherUser = (conversation) => {
@@ -119,13 +130,23 @@ export default function Sidebar({ conversations }) {
               {unreadCounts[conversation.id] > 0 && (
                 <span className="unread-badge">{unreadCounts[conversation.id]}</span>
               )}
-              <button
-                className="conversation-delete"
-                onClick={(e) => handleDelete(e, conversation.id)}
-                aria-label="Delete conversation"
-              >
-                ✕
-              </button>
+              {conversation.creatorId === user?.id ? (
+                <button
+                  className="conversation-delete"
+                  onClick={(e) => handleDelete(e, conversation.id)}
+                  aria-label="Delete conversation"
+                >
+                  ✕
+                </button>
+              ) : (
+                <button
+                  className="conversation-delete"
+                  onClick={(e) => handleLeave(e, conversation.id)}
+                  aria-label="Leave conversation"
+                >
+                  ←
+                </button>
+              )}
             </div>
           </NavLink>
         ))}

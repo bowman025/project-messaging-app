@@ -19,6 +19,31 @@ export const useConversationStore = create((set) => ({
       ),
     })),
 
+  removeParticipant: (conversationId, userId) => {
+    console.warn('removeParticipant called', { conversationId, userId });
+    set((state) => {
+      const conversation = state.conversations.find((c) => c.id === conversationId);
+      console.warn(
+        'conversation found:',
+        conversation?.id,
+        'participants:',
+        conversation?.participants?.map((p) => p.user?.id ?? p.userId)
+      );
+      return {
+        conversations: state.conversations.map((c) =>
+          c.id === conversationId
+            ? {
+              ...c,
+              participants: c.participants.filter(
+                (p) => String(p.user?.id ?? p.userId) !== String(userId)
+              ),
+            }
+            : c
+        ),
+      };
+    });
+  },
+
   updateLastMessage: (conversationId, message) =>
     set((state) => ({
       conversations: state.conversations

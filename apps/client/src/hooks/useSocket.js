@@ -29,7 +29,11 @@ export const useSocket = (conversations, activeConversationId) => {
     const previousId = previousConversationIdRef.current;
 
     if (previousId && previousId !== activeConversationId) {
-      socket.emit('leave:conversation', previousId);
+      const conversations = useConversationStore.getState().conversations;
+      const stillExists = conversations.some((c) => c.id === previousId);
+      if (stillExists) {
+        socket.emit('leave:conversation', { conversationId: previousId });
+      }
     }
 
     if (activeConversationId && previousId !== activeConversationId) {
@@ -133,6 +137,15 @@ export const useSocket = (conversations, activeConversationId) => {
       usePresenceStore.getState().setOffline(userId);
     };
 
+    const handleParticipantLeft = ({ conversationId, userId, deleted }) => {
+      console.warn('conversation:participant_left received', { conversationId, userId, deleted });
+      if (deleted) {
+        useConversationStore.getState().removeConversation(conversationId);
+      } else {
+        useConversationStore.getState().removeParticipant(conversationId, userId);
+      }
+    };
+
     socket.on('connect', joinRooms);
 
     socket.on('typing:start', handleTypingStart);
@@ -144,6 +157,8 @@ export const useSocket = (conversations, activeConversationId) => {
 
     socket.on('presence:online', handlePresenceOnline);
     socket.on('presence:offline', handlePresenceOffline);
+
+    socket.on('conversation:participant_left', handleParticipantLeft);
 
     if (socket.connected) {
       joinRooms();
@@ -161,6 +176,8 @@ export const useSocket = (conversations, activeConversationId) => {
 
       socket.off('presence:online', handlePresenceOnline);
       socket.off('presence:offline', handlePresenceOffline);
+
+      socket.off('conversation:participant_left', handleParticipantLeft);
     };
   }, []);
 

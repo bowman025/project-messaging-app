@@ -10,50 +10,63 @@ const adapter = new PrismaPg({
 const db = new PrismaClient({ adapter });
 
 async function main() {
-  const passwordHash = await bcrypt.hash('password123', 10);
+  await db.message.deleteMany();
+  await db.participant.deleteMany();
+  await db.conversation.deleteMany();
+  await db.user.deleteMany();
 
-  const alice = await db.user.upsert({
-    where: { email: 'alice@example.com' },
-    update: {},
-    create: {
-      username: 'alice',
-      email: 'alice@example.com',
-      passwordHash,
-    },
+  const passwordHash = await bcrypt.hash('Password123', 10);
+
+  const alice = await db.user.create({
+    data: { username: 'alice', email: 'alice@example.com', passwordHash },
   });
 
-  const bob = await db.user.upsert({
-    where: { email: 'bob@example.com' },
-    update: {},
-    create: {
-      username: 'bob',
-      email: 'bob@example.com',
-      passwordHash,
-    },
+  const bob = await db.user.create({
+    data: { username: 'bob', email: 'bob@example.com', passwordHash },
   });
 
-  const conversation = await db.conversation.create({
+  const dave = await db.user.create({
+    data: { username: 'dave', email: 'dave@example.com', passwordHash },
+  });
+
+  const dm = await db.conversation.create({
     data: {
+      creatorId: alice.id,
       participants: {
         create: [{ userId: alice.id }, { userId: bob.id }],
       },
     },
   });
 
-  await db.message.create({
+  const group = await db.conversation.create({
     data: {
-      content: 'Hey Bob!',
-      authorId: alice.id,
-      conversationId: conversation.id,
+      name: 'The Gang',
+      isGroup: true,
+      creatorId: alice.id,
+      participants: {
+        create: [{ userId: alice.id }, { userId: bob.id }, { userId: dave.id }],
+      },
     },
   });
 
   await db.message.create({
-    data: {
-      content: 'Hey Alice!',
-      authorId: bob.id,
-      conversationId: conversation.id,
-    },
+    data: { content: 'Hey Bob!', authorId: alice.id, conversationId: dm.id },
+  });
+
+  await db.message.create({
+    data: { content: 'Hey Alice!', authorId: bob.id, conversationId: dm.id },
+  });
+
+  await db.message.create({
+    data: { content: 'Hey everyone!', authorId: alice.id, conversationId: group.id },
+  });
+
+  await db.message.create({
+    data: { content: 'Hey Alice!', authorId: bob.id, conversationId: group.id },
+  });
+
+  await db.message.create({
+    data: { content: 'Hey all!', authorId: dave.id, conversationId: group.id },
   });
 
   console.warn('Seeding complete.');
