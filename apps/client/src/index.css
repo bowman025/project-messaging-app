@@ -1026,3 +1026,24 @@ input:focus {
     transform: rotate(360deg);
   }
 }
+
+.server-wake-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted, #666);
+}
+
+.server-wake-text {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.server-wake-sub {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted, #666);
+}

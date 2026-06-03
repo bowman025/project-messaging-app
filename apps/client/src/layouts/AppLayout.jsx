@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData, useNavigation, useParams } from 'react-router';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { useSocket } from '../hooks/useSocket.js';
@@ -11,6 +11,7 @@ export default function AppLayout() {
   const setUser = useAuthStore((state) => state.setUser);
   const navigation = useNavigation();
   const { id: activeConversationId } = useParams();
+  const [longLoad, setLongLoad] = useState(false);
 
   const isLoading = navigation.state === 'loading';
 
@@ -22,6 +23,18 @@ export default function AppLayout() {
     setConversations(loaderConversations);
   }, [loaderConversations, setConversations]);
 
+  useEffect(() => {
+    let timer;
+
+    if (isLoading) {
+      timer = setTimeout(() => setLongLoad(true), 2000);
+    } else {
+      timer = setTimeout(() => setLongLoad(false), 0);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
   useSocket(conversations, activeConversationId);
 
   return (
@@ -29,9 +42,19 @@ export default function AppLayout() {
       <Sidebar conversations={conversations} />
       <main className="main-content">
         {isLoading ? (
-          <div className="loading-state">
-            <div className="loading-spinner" />
-          </div>
+          longLoad ? (
+            <div className="server-wake-loading" role="status" aria-live="polite">
+              <div className="loading-spinner" />
+              <div className="server-wake-text">Waking server…</div>
+              <div className="server-wake-sub">
+                The server may take up to a minute to start. Please wait.
+              </div>
+            </div>
+          ) : (
+            <div className="loading-state">
+              <div className="loading-spinner" />
+            </div>
+          )
         ) : (
           <Outlet />
         )}
