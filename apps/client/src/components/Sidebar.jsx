@@ -15,12 +15,13 @@ import {
   isConversationOnline,
 } from '../utils/participants.js';
 
-export default function Sidebar() {
+export default function Sidebar({ conversations: propConversations, collapsed = false }) {
   const navigate = useNavigate();
   const { id: activeId } = useParams();
   const { user, clearAuth } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
-  const conversations = useConversationStore((state) => state.conversations);
+  const storeConversations = useConversationStore((state) => state.conversations);
+  const conversations = propConversations ?? storeConversations;
   const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
@@ -70,7 +71,11 @@ export default function Sidebar() {
   const conversationOnline = (conversation) => isConversationOnline(conversation, user?.id, onlineUsers);
 
   return (
-    <aside className="sidebar">
+    <aside
+      id="app-sidebar"
+      className={`sidebar ${collapsed ? 'collapsed' : ''}`}
+      aria-hidden={collapsed}
+    >
       <div className="sidebar-header">
         <div className="sidebar-user">
           <Avatar user={user} size="sm" />

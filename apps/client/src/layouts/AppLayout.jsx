@@ -12,6 +12,7 @@ export default function AppLayout() {
   const navigation = useNavigation();
   const { id: activeConversationId } = useParams();
   const [longLoad, setLongLoad] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const isLoading = navigation.state === 'loading';
 
@@ -38,8 +39,17 @@ export default function AppLayout() {
   useSocket(conversations, activeConversationId);
 
   return (
-    <div className="app-layout">
-      <Sidebar conversations={conversations} />
+    <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <button
+        className="sidebar-toggle"
+        aria-label={sidebarCollapsed ? 'Open sidebar' : 'Close sidebar'}
+        aria-expanded={!sidebarCollapsed}
+        aria-controls="app-sidebar"
+        onClick={() => setSidebarCollapsed((s) => !s)}
+      >
+        ☰
+      </button>
+      <Sidebar conversations={conversations} collapsed={sidebarCollapsed} />
       <main className="main-content">
         {isLoading ? (
           longLoad ? (
