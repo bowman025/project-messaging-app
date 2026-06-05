@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { fetchWithAuth } from '../lib/api.js';
 import { useConversationStore } from '../store/conversationStore.js';
@@ -83,7 +84,7 @@ export default function NewConversationModal({ onClose }) {
     }
   };
 
-  return (
+  const modal = (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="New conversation">
       <div className="modal">
         <div className="modal-header">
@@ -153,4 +154,10 @@ export default function NewConversationModal({ onClose }) {
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modal, document.body);
+  }
+
+  return modal;
 }

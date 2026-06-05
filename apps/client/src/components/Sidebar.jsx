@@ -4,10 +4,9 @@ import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { fetchWithAuth } from '../lib/api.js';
-import { getSocket, disconnectSocket } from '../lib/socket.js';
+import { getSocket } from '../lib/socket.js';
 import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
-import { useTheme } from '../hooks/useTheme.js';
 import Avatar from './Avatar.jsx';
 import {
   getOtherUser,
@@ -15,23 +14,19 @@ import {
   isConversationOnline,
 } from '../utils/participants.js';
 
-export default function Sidebar({ conversations: propConversations, collapsed = false }) {
+export default function Sidebar({ conversations: propConversations, collapsed = false, onInteract }) {
   const navigate = useNavigate();
   const { id: activeId } = useParams();
-  const { user, clearAuth } = useAuthStore();
+  const { user } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
   const storeConversations = useConversationStore((state) => state.conversations);
   const conversations = propConversations ?? storeConversations;
   const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
-    disconnectSocket();
-    clearAuth();
-    navigate('/login');
-  };
+
+
 
   const handleDelete = async (e, conversationId) => {
     e.preventDefault();
@@ -58,7 +53,6 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
     if (activeId === conversationId) navigate('/conversations');
   };
 
-
   const getLastMessage = (conversation) => {
     const msg = conversation.messages?.[0];
     if (!msg) return 'No messages yet';
@@ -74,22 +68,30 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
     <aside
       id="app-sidebar"
       className={`sidebar ${collapsed ? 'collapsed' : ''}`}
-      aria-hidden={collapsed}
     >
       <div className="sidebar-header">
         <div className="sidebar-user">
           <Avatar user={user} size="sm" />
-          <Link to="/profile" className="sidebar-username">{user?.username}</Link>
-        </div>
-        <div className="sidebar-header-actions">
-          <button onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
-          <button onClick={handleLogout}>Logout</button>
+          <Link
+            to="/profile"
+            className="sidebar-username"
+            onClick={() => {
+              if (typeof onInteract === 'function') onInteract();
+            }}
+          >
+            {user?.username}
+          </Link>
         </div>
       </div>
       <div className="sidebar-actions">
-        <button onClick={() => setShowModal(true)}>+ New Conversation</button>
+        <button
+          onClick={() => {
+            setShowModal(true);
+            if (typeof onInteract === 'function') onInteract();
+          }}
+        >
+          + New Conversation
+        </button>
       </div>
       <nav className="conversation-list">
         {conversations.map((conversation) => (
@@ -99,6 +101,9 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
             className={({ isActive }) =>
               isActive ? 'conversation-item active' : 'conversation-item'
             }
+            onClick={() => {
+              if (typeof onInteract === 'function') onInteract();
+            }}
           >
             <Avatar
               user={conversation.isGroup ? null : otherUserForAvatar(conversation)}
@@ -131,7 +136,10 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
               {conversation.creatorId === user?.id ? (
                 <button
                   className="conversation-delete"
-                  onClick={(e) => handleDelete(e, conversation.id)}
+                  onClick={(e) => {
+                    handleDelete(e, conversation.id);
+                    if (typeof onInteract === 'function') onInteract();
+                  }}
                   aria-label="Delete conversation"
                 >
                   ✕
@@ -139,7 +147,10 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
               ) : (
                 <button
                   className="conversation-delete"
-                  onClick={(e) => handleLeave(e, conversation.id)}
+                  onClick={(e) => {
+                    handleLeave(e, conversation.id);
+                    if (typeof onInteract === 'function') onInteract();
+                  }}
                   aria-label="Leave conversation"
                 >
                   ←
