@@ -22,31 +22,32 @@ const io = new Server(httpServer, {
 });
 const PORT = env.PORT || 3000;
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
-      connectSrc: [
-        "'self'",
-        "https://api.cloudinary.com",
-        "wss:",
-        "ws:",
-        ...(env.NODE_ENV === 'production'
-          ? [env.CLIENT_URL]
-          : ["http://localhost:5173", "ws://localhost:5173"]
-        ),
-      ],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'", "https://res.cloudinary.com"],
-      frameSrc: ["'none'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com'],
+        connectSrc: [
+          "'self'",
+          'https://api.cloudinary.com',
+          'wss:',
+          'ws:',
+          ...(env.NODE_ENV === 'production'
+            ? [env.CLIENT_URL]
+            : ['http://localhost:5173', 'ws://localhost:5173']),
+        ],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'", 'https://res.cloudinary.com'],
+        frameSrc: ["'none'"],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
+    crossOriginEmbedderPolicy: false,
+  })
+);
 app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());

@@ -91,7 +91,9 @@ export default function MessageInput({ onSend, conversationId }) {
       {imagePreview && (
         <div className="message-image-preview">
           <img src={imagePreview} alt="Attachment" />
-          <button onClick={handleRemoveImage} aria-label="Remove image">✕</button>
+          <button onClick={handleRemoveImage} aria-label="Remove image">
+            ✕
+          </button>
         </div>
       )}
       {error && <p className="message-input-error">{error}</p>}

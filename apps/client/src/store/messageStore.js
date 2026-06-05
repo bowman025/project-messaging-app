@@ -5,18 +5,16 @@ export const useMessageStore = create((set) => ({
   nextCursor: null,
   hasMore: true,
 
-  setMessages: (messages, nextCursor) => set({
-    messages,
-    nextCursor: nextCursor ?? null,
-    hasMore: nextCursor !== null,
-  }),
+  setMessages: (messages, nextCursor) =>
+    set({
+      messages,
+      nextCursor: nextCursor ?? null,
+      hasMore: nextCursor !== null,
+    }),
 
   prependMessages: (olderMessages, nextCursor) =>
     set((state) => ({
-      messages: [
-        ...olderMessages.map((m) => ({ ...m, isOlderBatch: true })),
-        ...state.messages,
-      ],
+      messages: [...olderMessages.map((m) => ({ ...m, isOlderBatch: true })), ...state.messages],
       nextCursor: nextCursor ?? null,
       hasMore: nextCursor !== null,
     })),
@@ -33,9 +31,7 @@ export const useMessageStore = create((set) => ({
 
   updateMessage: (updatedMessage) =>
     set((state) => ({
-      messages: state.messages.map((m) =>
-        m.id === updatedMessage.id ? updatedMessage : m
-      ),
+      messages: state.messages.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)),
     })),
 
   deleteMessage: (messageId) =>

@@ -25,10 +25,10 @@ export const uploadImage = async (file, type) => {
   formData.append('allowed_formats', 'jpg,jpeg,png,webp,gif,avif');
   formData.append('api_key', apiKey);
 
-  const uploadRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    { method: 'POST', body: formData }
-  );
+  const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
 
   if (!uploadRes.ok) throw new Error('Failed to upload image');
 

@@ -32,9 +32,7 @@ export const patchProfile = async (req, res, next) => {
 
     if (username && username !== req.user.username) {
       const existing = await findUsersByUsername(username, req.user.id);
-      const exact = existing.find(
-        (u) => u.username.toLowerCase() === username.toLowerCase()
-      );
+      const exact = existing.find((u) => u.username.toLowerCase() === username.toLowerCase());
       if (exact) throw new AppError('Username already taken', 409);
     }
 

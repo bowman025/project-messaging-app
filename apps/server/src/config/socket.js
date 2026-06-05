@@ -28,8 +28,7 @@ export const initSocket = (io) => {
     });
 
     socket.on('leave:conversation', async (payload) => {
-      const conversationId =
-        typeof payload === 'string' ? payload : payload?.conversationId;
+      const conversationId = typeof payload === 'string' ? payload : payload?.conversationId;
 
       if (!conversationId) {
         socket.emit('error', { message: 'Missing conversationId' });

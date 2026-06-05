@@ -37,7 +37,9 @@ export const getConversationById = async (id, userId, cursor = null, limit = 30)
   const messages = await db.message.findMany({
     where: {
       conversationId: id,
-      ...(cursor ? { createdAt: { lt: (await db.message.findUnique({ where: { id: cursor } }))?.createdAt } } : {}),
+      ...(cursor
+        ? { createdAt: { lt: (await db.message.findUnique({ where: { id: cursor } }))?.createdAt } }
+        : {}),
     },
     include: { author: { select: { id: true, username: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
@@ -78,7 +80,8 @@ export const deleteConversation = async (id, userId) => {
   });
 
   if (!conversation) throw new AppError('Conversation not found', 404);
-  if (conversation.creatorId !== userId) throw new AppError('Only the creator can delete this conversation', 403);
+  if (conversation.creatorId !== userId)
+    throw new AppError('Only the creator can delete this conversation', 403);
 
   return db.conversation.delete({ where: { id } });
 };

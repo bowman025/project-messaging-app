@@ -35,4 +35,3 @@ export const createTestConversation = async (participantIds) => {
     },
   });
 };
-

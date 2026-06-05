@@ -34,9 +34,9 @@ export const useConversationStore = create((set) => ({
       const updated = state.conversations.map((c) =>
         c.id === conversationId
           ? {
-            ...c,
-            participants: c.participants.filter((p) => normalize(p) !== String(userId)),
-          }
+              ...c,
+              participants: c.participants.filter((p) => normalize(p) !== String(userId)),
+            }
           : c
       );
 
@@ -50,9 +50,7 @@ export const useConversationStore = create((set) => ({
     set((state) => ({
       conversations: state.conversations
         .map((c) =>
-          c.id === conversationId
-            ? { ...c, messages: [message], updatedAt: message.createdAt }
-            : c
+          c.id === conversationId ? { ...c, messages: [message], updatedAt: message.createdAt } : c
         )
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)),
     })),

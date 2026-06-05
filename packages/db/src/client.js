@@ -20,9 +20,8 @@ const createClient = () => {
   });
 };
 
-const db = process.env.NODE_ENV === 'test'
-  ? createClient()
-  : (globalForPrisma.prisma ?? createClient());
+const db =
+  process.env.NODE_ENV === 'test' ? createClient() : (globalForPrisma.prisma ?? createClient());
 
 if (process.env.NODE_ENV === 'development') {
   globalForPrisma.prisma = db;

@@ -101,20 +101,27 @@ export const postConversation = async (req, res, next) => {
 
 export const removeConversation = async (req, res, next) => {
   try {
-
     const conversation = await getConversationById(req.params.id, req.user.id);
     await deleteConversation(req.params.id, req.user.id);
 
     try {
       const io = getIO();
       if (io) {
-        io.to(req.params.id).emit('conversation:deleted', { conversationId: req.params.id, deletedBy: req.user.id });
+        io.to(req.params.id).emit('conversation:deleted', {
+          conversationId: req.params.id,
+          deletedBy: req.user.id,
+        });
         if (conversation?.participants?.length) {
-          const participantIds = conversation.participants.map((p) => p.user?.id ?? p.userId ?? p.id).filter(Boolean);
+          const participantIds = conversation.participants
+            .map((p) => p.user?.id ?? p.userId ?? p.id)
+            .filter(Boolean);
           for (const socket of io.sockets.sockets.values()) {
             const sidUserId = socket.user?.id;
             if (sidUserId && participantIds.includes(sidUserId)) {
-              socket.emit('conversation:deleted', { conversationId: req.params.id, deletedBy: req.user.id });
+              socket.emit('conversation:deleted', {
+                conversationId: req.params.id,
+                deletedBy: req.user.id,
+              });
             }
           }
         }

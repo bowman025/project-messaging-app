@@ -2,7 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import Avatar from './Avatar.jsx';
 
-export default function MessageList({ messages, currentUserId, onEdit, onDelete, bottomRef, topRef, hasMore, containerRef }) {
+export default function MessageList({
+  messages,
+  currentUserId,
+  onEdit,
+  onDelete,
+  bottomRef,
+  topRef,
+  hasMore,
+  containerRef,
+}) {
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const editInputRef = useRef(null);
@@ -36,7 +45,10 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
         const isOwn = message.authorId === currentUserId;
 
         return (
-          <div key={message.id} className={`message ${isOwn ? 'message--own' : ''} ${message.isOptimistic ? 'message--optimistic' : ''}`}>
+          <div
+            key={message.id}
+            className={`message ${isOwn ? 'message--own' : ''} ${message.isOptimistic ? 'message--optimistic' : ''}`}
+          >
             {!isOwn && <Avatar user={message.author} size="sm" />}
             <div className="message-body">
               {!isOwn && <span className="message-author">{message.author.username}</span>}
@@ -71,7 +83,10 @@ export default function MessageList({ messages, currentUserId, onEdit, onDelete,
                     </button>
                   )}
                   {message.content && (
-                    <p>{message.content}{message.edited && <span className="message-edited"> (edited)</span>}</p>
+                    <p>
+                      {message.content}
+                      {message.edited && <span className="message-edited"> (edited)</span>}
+                    </p>
                   )}
                 </div>
               )}

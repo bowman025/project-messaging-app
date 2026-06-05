@@ -21,7 +21,8 @@ export const appLoader = async () => {
     removeToken();
     return redirect('/login');
   }
-  if (!conversationsRes.ok) throw new Response('Failed to load conversations', { status: conversationsRes.status });
+  if (!conversationsRes.ok)
+    throw new Response('Failed to load conversations', { status: conversationsRes.status });
 
   const conversationsData = await conversationsRes.json();
 

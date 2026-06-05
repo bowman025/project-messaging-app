@@ -89,7 +89,9 @@ export default function NewConversationModal({ onClose }) {
       <div className="modal">
         <div className="modal-header">
           <h2>{isGroup ? 'New Group' : 'New Conversation'}</h2>
-          <button onClick={onClose} aria-label="Close">✕</button>
+          <button onClick={onClose} aria-label="Close">
+            ✕
+          </button>
         </div>
 
         {selected.length > 0 && (
@@ -97,7 +99,12 @@ export default function NewConversationModal({ onClose }) {
             {selected.map((user) => (
               <span key={user.id} className="selected-user-tag">
                 {user.username}
-                <button onClick={() => handleDeselect(user.id)} aria-label={`Remove ${user.username}`}>✕</button>
+                <button
+                  onClick={() => handleDeselect(user.id)}
+                  aria-label={`Remove ${user.username}`}
+                >
+                  ✕
+                </button>
               </span>
             ))}
           </div>
@@ -127,9 +134,7 @@ export default function NewConversationModal({ onClose }) {
 
         <ul className="user-search-results">
           {isSearching && <li>Searching...</li>}
-          {!isSearching && users.length === 0 && query.length > 0 && (
-            <li>No users found</li>
-          )}
+          {!isSearching && users.length === 0 && query.length > 0 && <li>No users found</li>}
           {users.map((user) => (
             <li key={user.id}>
               <span>{user.username}</span>

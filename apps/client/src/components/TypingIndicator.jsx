@@ -28,7 +28,9 @@ export default function TypingIndicator({ conversationId }) {
   return (
     <div className="typing-indicator">
       <span className="typing-dots">
-        <span /><span /><span />
+        <span />
+        <span />
+        <span />
       </span>
       <span className="typing-text">{text}</span>
     </div>

@@ -85,9 +85,7 @@ export default function ConversationPage() {
     const scrollHeightBefore = container?.scrollHeight ?? 0;
 
     try {
-      const res = await fetchWithAuth(
-        `/api/conversations/${id}/messages?cursor=${nextCursor}`
-      );
+      const res = await fetchWithAuth(`/api/conversations/${id}/messages?cursor=${nextCursor}`);
       if (!res.ok) return;
 
       const data = await res.json();

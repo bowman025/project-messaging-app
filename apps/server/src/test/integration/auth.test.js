@@ -7,14 +7,12 @@ const app = createTestApp();
 
 describe('POST /api/auth/register', () => {
   it('registers a new user successfully', async () => {
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        username: 'newuser',
-        email: 'new@example.com',
-        password: 'Password123',
-        confirmPassword: 'Password123',
-      });
+    const res = await request(app).post('/api/auth/register').send({
+      username: 'newuser',
+      email: 'new@example.com',
+      password: 'Password123',
+      confirmPassword: 'Password123',
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.status).toBe('success');
@@ -26,27 +24,23 @@ describe('POST /api/auth/register', () => {
   it('rejects duplicate email', async () => {
     await createTestUser({ email: 'existing@example.com' });
 
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        username: 'newuser',
-        email: 'existing@example.com',
-        password: 'Password123',
-        confirmPassword: 'Password123',
-      });
+    const res = await request(app).post('/api/auth/register').send({
+      username: 'newuser',
+      email: 'existing@example.com',
+      password: 'Password123',
+      confirmPassword: 'Password123',
+    });
 
     expect(res.status).toBe(409);
   });
 
   it('rejects invalid input', async () => {
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        username: 'ab',
-        email: 'notanemail',
-        password: 'short',
-        confirmPassword: 'different',
-      });
+    const res = await request(app).post('/api/auth/register').send({
+      username: 'ab',
+      email: 'notanemail',
+      password: 'short',
+      confirmPassword: 'different',
+    });
 
     expect(res.status).toBe(400);
   });
@@ -92,9 +86,7 @@ describe('GET /api/auth/me', () => {
     const user = await createTestUser({ email: 'me@example.com' });
     const token = getAuthToken(user.id);
 
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', `Bearer ${token}`);
+    const res = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.user.id).toBe(user.id);
@@ -107,9 +99,7 @@ describe('GET /api/auth/me', () => {
   });
 
   it('returns 401 with invalid token', async () => {
-    const res = await request(app)
-      .get('/api/auth/me')
-      .set('Authorization', 'Bearer invalidtoken');
+    const res = await request(app).get('/api/auth/me').set('Authorization', 'Bearer invalidtoken');
 
     expect(res.status).toBe(401);
   });

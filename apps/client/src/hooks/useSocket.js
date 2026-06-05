@@ -39,9 +39,7 @@ export const useSocket = (conversations, activeConversationId) => {
     const socket = connectSocket();
 
     const joinRooms = () => {
-      const conversationIds = conversationsRef.current.map(
-        (conversation) => conversation.id
-      );
+      const conversationIds = conversationsRef.current.map((conversation) => conversation.id);
 
       socket.emit('join:conversations', conversationIds);
       socket.emit('presence:online', conversationIds);
@@ -53,71 +51,39 @@ export const useSocket = (conversations, activeConversationId) => {
       }
     };
 
-    const handleTypingStart = ({
-      userId,
-      username,
-      conversationId,
-    }) => {
-      useTypingStore
-        .getState()
-        .setTyping(conversationId, userId, username);
+    const handleTypingStart = ({ userId, username, conversationId }) => {
+      useTypingStore.getState().setTyping(conversationId, userId, username);
     };
 
-    const handleTypingStop = ({
-      userId,
-      conversationId,
-    }) => {
-      useTypingStore
-        .getState()
-        .clearTyping(conversationId, userId);
+    const handleTypingStop = ({ userId, conversationId }) => {
+      useTypingStore.getState().clearTyping(conversationId, userId);
     };
 
     const handleNewMessage = (message) => {
       const activeId = activeConversationIdRef.current;
 
-      useConversationStore
-        .getState()
-        .updateLastMessage(message.conversationId, message);
+      useConversationStore.getState().updateLastMessage(message.conversationId, message);
 
       if (message.conversationId === activeId) {
         if (message.tempId) {
-          useMessageStore
-            .getState()
-            .confirmMessage(message.tempId, message);
+          useMessageStore.getState().confirmMessage(message.tempId, message);
         } else {
-          useMessageStore
-            .getState()
-            .addMessage(message);
+          useMessageStore.getState().addMessage(message);
         }
       } else {
-        useConversationStore
-          .getState()
-          .incrementUnread(message.conversationId);
+        useConversationStore.getState().incrementUnread(message.conversationId);
       }
     };
 
     const handleEditedMessage = (message) => {
-      if (
-        message.conversationId ===
-        activeConversationIdRef.current
-      ) {
-        useMessageStore
-          .getState()
-          .updateMessage(message);
+      if (message.conversationId === activeConversationIdRef.current) {
+        useMessageStore.getState().updateMessage(message);
       }
     };
 
-    const handleDeletedMessage = ({
-      messageId,
-      conversationId,
-    }) => {
-      if (
-        conversationId ===
-        activeConversationIdRef.current
-      ) {
-        useMessageStore
-          .getState()
-          .deleteMessage(messageId);
+    const handleDeletedMessage = ({ messageId, conversationId }) => {
+      if (conversationId === activeConversationIdRef.current) {
+        useMessageStore.getState().deleteMessage(messageId);
       }
     };
 
@@ -134,7 +100,6 @@ export const useSocket = (conversations, activeConversationId) => {
     };
 
     const handleParticipantLeft = ({ conversationId, userId, deleted }) => {
-
       if (deleted) {
         useConversationStore.getState().removeConversation(conversationId);
       } else {

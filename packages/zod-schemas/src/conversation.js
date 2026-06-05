@@ -9,5 +9,5 @@ export const createConversationSchema = z.object({
     .trim()
     .min(1, 'Name must be at least 1 character')
     .max(64, 'Name must be at most 64 characters')
-    .optional()
+    .optional(),
 });

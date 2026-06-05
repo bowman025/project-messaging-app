@@ -67,6 +67,7 @@ export default function AppLayout() {
     clearAuth();
     navigate('/login');
   };
+
   return (
     <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <button

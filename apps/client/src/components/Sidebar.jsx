@@ -8,13 +8,13 @@ import { getSocket } from '../lib/socket.js';
 import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import Avatar from './Avatar.jsx';
-import {
-  getOtherUser,
-  getConversationName,
-  isConversationOnline,
-} from '../utils/participants.js';
+import { getOtherUser, getConversationName, isConversationOnline } from '../utils/participants.js';
 
-export default function Sidebar({ conversations: propConversations, collapsed = false, onInteract }) {
+export default function Sidebar({
+  conversations: propConversations,
+  collapsed = false,
+  onInteract,
+}) {
   const navigate = useNavigate();
   const { id: activeId } = useParams();
   const { user } = useAuthStore();
@@ -24,9 +24,6 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
   const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
-
-
-
 
   const handleDelete = async (e, conversationId) => {
     e.preventDefault();
@@ -62,13 +59,11 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
 
   const otherUserForAvatar = (conversation) => getOtherUser(conversation, user?.id);
   const nameForConversation = (conversation) => getConversationName(conversation, user?.id);
-  const conversationOnline = (conversation) => isConversationOnline(conversation, user?.id, onlineUsers);
+  const conversationOnline = (conversation) =>
+    isConversationOnline(conversation, user?.id, onlineUsers);
 
   return (
-    <aside
-      id="app-sidebar"
-      className={`sidebar ${collapsed ? 'collapsed' : ''}`}
-    >
+    <aside id="app-sidebar" className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-user">
           <Avatar user={user} size="sm" />
@@ -112,20 +107,18 @@ export default function Sidebar({ conversations: propConversations, collapsed = 
             <div className="conversation-info">
               <div className="conversation-name">
                 {nameForConversation(conversation)}
-                {conversationOnline(conversation) && (
-                  <span className="online-indicator" />
-                )}
+                {conversationOnline(conversation) && <span className="online-indicator" />}
               </div>
-              <div className="conversation-last-message">
-                {getLastMessage(conversation)}
-              </div>
+              <div className="conversation-last-message">{getLastMessage(conversation)}</div>
             </div>
             <div className="conversation-meta">
               <div
                 className="conversation-time"
-                title={conversation.updatedAt
-                  ? format(new Date(conversation.updatedAt), 'MMM d, yyyy HH:mm')
-                  : ''}
+                title={
+                  conversation.updatedAt
+                    ? format(new Date(conversation.updatedAt), 'MMM d, yyyy HH:mm')
+                    : ''
+                }
               >
                 {conversation.updatedAt &&
                   formatDistanceToNow(new Date(conversation.updatedAt), { addSuffix: true })}

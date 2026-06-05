@@ -24,10 +24,7 @@ export const getUploadSignature = (req, res) => {
     allowed_formats: 'jpg,jpeg,png,webp,gif,avif',
   };
 
-  const signature = cloudinary.utils.api_sign_request(
-    paramsToSign,
-    env.CLOUDINARY_API_SECRET
-  );
+  const signature = cloudinary.utils.api_sign_request(paramsToSign, env.CLOUDINARY_API_SECRET);
 
   res.json({
     status: 'success',

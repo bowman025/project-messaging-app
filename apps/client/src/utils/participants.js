@@ -1,5 +1,5 @@
 export function getParticipantId(p) {
-  return typeof p === 'string' ? p : p?.user?.id ?? p?.userId ?? p?.id;
+  return typeof p === 'string' ? p : (p?.user?.id ?? p?.userId ?? p?.id);
 }
 
 export function getParticipantUser(p) {

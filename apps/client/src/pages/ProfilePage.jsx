@@ -94,10 +94,7 @@ export default function ProfilePage() {
 
         <div className="avatar-upload">
           <div className="avatar-upload-preview">
-            <Avatar
-              user={{ ...user, avatarUrl: avatarPreview }}
-              size="lg"
-            />
+            <Avatar user={{ ...user, avatarUrl: avatarPreview }} size="lg" />
             <button
               type="button"
               className="avatar-upload-btn"
@@ -125,14 +122,23 @@ export default function ProfilePage() {
 
           <div className="form-field">
             <label htmlFor="bio">Bio</label>
-            <textarea id="bio" rows={3} {...register('bio')} placeholder="Tell us about yourself..." />
+            <textarea
+              id="bio"
+              rows={3}
+              {...register('bio')}
+              placeholder="Tell us about yourself..."
+            />
             {errors.bio && <p className="form-error">{errors.bio.message}</p>}
           </div>
 
           {errors.root && <p className="form-root-error">{errors.root.message}</p>}
           {success && <p className="form-success">Profile updated successfully.</p>}
 
-          <button type="submit" className="btn-primary" disabled={isSubmitting || isUploading || !isDirty}>
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={isSubmitting || isUploading || !isDirty}
+          >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </form>
