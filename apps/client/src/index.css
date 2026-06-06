@@ -743,6 +743,7 @@ input:focus {
 }
 
 @keyframes typing-bounce {
+
   0%,
   80%,
   100% {
@@ -1117,12 +1118,6 @@ input:focus {
 .error-page button {
   background: var(--color-primary);
   color: var(--color-primary-text);
-}
-
-.error-page button:last-child {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
 }
 
 /* ── Not found page ── */

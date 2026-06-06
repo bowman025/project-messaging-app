@@ -19,7 +19,6 @@ export default function ErrorPage() {
       <h1>Something went wrong</h1>
       <p>{getErrorMessage()}</p>
       <div>
-        <button onClick={() => navigate(-1)}>Go back</button>
         <button onClick={() => navigate('/conversations')}>Go home</button>
       </div>
     </div>
