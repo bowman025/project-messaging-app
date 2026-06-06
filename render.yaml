@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: project-messaging-app-server
+    runtime: node
+    rootDir: apps/server
+    buildCommand: cd ../../packages/db && npm install && npx prisma generate && cd ../../apps/server && npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "test": "NODE_ENV=test vitest run",
     "test:watch": "NODE_ENV=test vitest",
-    "test:coverage": "NODE_ENV=test vitest run --coverage"
+    "test:coverage": "NODE_ENV=test vitest run --coverage",
+    "db:generate": "prisma generate --config ../../packages/db/prisma.config.js",
+    "db:migrate:prod": "prisma migrate deploy --config ../../packages/db/prisma.config.js"
   },
   "type": "module",
   "dependencies": {
