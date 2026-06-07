@@ -151,38 +151,38 @@ The app is split across two hosting providers:
 
 Set these in the Render dashboard:
 
-| Variable | Description |
-| --- | --- |
-| `NODE_ENV` | `production` |
-| `DATABASE_URL` | Neon connection string |
-| `JWT_SECRET` | Strong random secret (`openssl rand -base64 32`) |
-| `CLIENT_URL` | Your Netlify domain |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| Variable                | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `NODE_ENV`              | `production`                                     |
+| `DATABASE_URL`          | Neon connection string                           |
+| `JWT_SECRET`            | Strong random secret (`openssl rand -base64 32`) |
+| `CLIENT_URL`            | Your Netlify domain                              |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name                            |
+| `CLOUDINARY_API_KEY`    | Cloudinary API key                               |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret                            |
 
 Set these in the Netlify dashboard:
 
-| Variable | Description |
-| --- | --- |
+| Variable       | Description             |
+| -------------- | ----------------------- |
 | `VITE_API_URL` | Your Render service URL |
 
 ## Available Scripts
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Start both server and client |
-| `npm run dev:server` | Start server only |
-| `npm run dev:client` | Start client only |
-| `npm run build` | Build the client |
-| `npm test` | Run tests |
-| `npm run lint` | Lint all workspaces |
-| `npm run format` | Format all files with Prettier |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:migrate` | Run database migrations |
-| `npm run db:studio` | Open Prisma Studio |
-| `npm run db:seed` | Seed the database |
+| Script                | Description                    |
+| --------------------- | ------------------------------ |
+| `npm run dev`         | Start both server and client   |
+| `npm run dev:server`  | Start server only              |
+| `npm run dev:client`  | Start client only              |
+| `npm run build`       | Build the client               |
+| `npm test`            | Run tests                      |
+| `npm run lint`        | Lint all workspaces            |
+| `npm run format`      | Format all files with Prettier |
+| `npm run db:generate` | Generate Prisma client         |
+| `npm run db:migrate`  | Run database migrations        |
+| `npm run db:studio`   | Open Prisma Studio             |
+| `npm run db:seed`     | Seed the database              |
 
 ---
 
-*Built with AI assistance.*
+_Built with AI assistance._

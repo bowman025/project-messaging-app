@@ -13,7 +13,6 @@ export default function AppLayout() {
   const setUser = useAuthStore((state) => state.setUser);
   const navigation = useNavigation();
   const { id: activeConversationId } = useParams();
-  const [longLoad, setLongLoad] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -28,18 +27,6 @@ export default function AppLayout() {
   useEffect(() => {
     setConversations(loaderConversations);
   }, [loaderConversations, setConversations]);
-
-  useEffect(() => {
-    let timer;
-
-    if (isLoading) {
-      timer = setTimeout(() => setLongLoad(true), 2000);
-    } else {
-      timer = setTimeout(() => setLongLoad(false), 0);
-    }
-
-    return () => clearTimeout(timer);
-  }, [isLoading]);
 
   useSocket(conversations, activeConversationId);
 
@@ -92,19 +79,9 @@ export default function AppLayout() {
       </div>
       <main className="main-content">
         {isLoading ? (
-          longLoad ? (
-            <div className="server-wake-loading" role="status" aria-live="polite">
-              <div className="loading-spinner" />
-              <div className="server-wake-text">Waking server…</div>
-              <div className="server-wake-sub">
-                The server may take up to a minute to start. Please wait.
-              </div>
-            </div>
-          ) : (
-            <div className="loading-state">
-              <div className="loading-spinner" />
-            </div>
-          )
+          <div className="loading-state">
+            <div className="loading-spinner" />
+          </div>
         ) : (
           <Outlet />
         )}

@@ -116,6 +116,7 @@ export default function MessageInput({ onSend, conversationId }) {
         />
         <input
           type="text"
+          id="message"
           value={content}
           onChange={handleContentChange}
           onKeyDown={(e) => {

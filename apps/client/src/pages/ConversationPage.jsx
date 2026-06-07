@@ -26,10 +26,9 @@ export default function ConversationPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!storeConversation) {
-      navigate('/conversations');
-    }
+    if (!storeConversation) navigate('/conversations');
   }, [storeConversation, navigate]);
+
   const messages = useMessageStore((state) => state.messages);
   const nextCursor = useMessageStore((state) => state.nextCursor);
   const hasMore = useMessageStore((state) => state.hasMore);
@@ -38,56 +37,45 @@ export default function ConversationPage() {
   const addMessage = useMessageStore((state) => state.addMessage);
   const clearUnread = useConversationStore((state) => state.clearUnread);
   const user = useAuthStore((state) => state.user);
-  const bottomRef = useRef(null);
-  const topRef = useRef(null);
-  const messageListRef = useRef(null);
+  const containerRef = useRef(null);
   const isLoadingMore = useRef(false);
-  const hasInitiallyScrolled = useRef(false);
-  const prevMessageCountRef = useRef(0);
+
+  const scrollToBottom = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    container.scrollTop = container.scrollHeight;
+  }, []);
+
+  const isNearBottom = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return true;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+  }, []);
 
   useEffect(() => {
     setMessages(conversation.messages, conversation.nextCursor);
   }, [conversation.messages, conversation.nextCursor, setMessages]);
 
   useEffect(() => {
-    hasInitiallyScrolled.current = false;
-    prevMessageCountRef.current = 0;
     clearUnread(id);
-  }, [id, clearUnread]);
+    const timer = setTimeout(() => scrollToBottom(), 0);
+    return () => clearTimeout(timer);
+  }, [id, clearUnread, scrollToBottom]);
 
   useEffect(() => {
-    if (messages.length > 0 && !hasInitiallyScrolled.current) {
-      bottomRef.current?.scrollIntoView({ behavior: 'instant' });
-      hasInitiallyScrolled.current = true;
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    const prevCount = prevMessageCountRef.current;
-    const currentCount = messages.length;
-
-    if (currentCount > prevCount && hasInitiallyScrolled.current) {
-      const lastMessage = messages[currentCount - 1];
-      if (lastMessage && !lastMessage.isOlderBatch) {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    prevMessageCountRef.current = currentCount;
-  }, [messages]);
+    if (isNearBottom()) scrollToBottom();
+  }, [messages, isNearBottom, scrollToBottom]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore.current || !nextCursor) return;
 
     isLoadingMore.current = true;
-
-    const container = messageListRef.current;
+    const container = containerRef.current;
     const scrollHeightBefore = container?.scrollHeight ?? 0;
 
     try {
       const res = await fetchWithAuth(`/api/conversations/${id}/messages?cursor=${nextCursor}`);
       if (!res.ok) return;
-
       const data = await res.json();
       prependMessages(data.messages, data.nextCursor);
 
@@ -101,28 +89,10 @@ export default function ConversationPage() {
     }
   }, [id, nextCursor, hasMore, prependMessages]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) loadMore();
-      },
-      { threshold: 0.1 }
-    );
-
-    const current = topRef.current;
-    if (current) observer.observe(current);
-
-    return () => {
-      if (current) observer.unobserve(current);
-    };
-  }, [loadMore]);
-
   const handleSend = ({ content, imageUrl } = {}) => {
     const socket = getSocket();
     if (!socket) return;
-
     const tempId = `temp_${Date.now()}`;
-
     addMessage({
       id: tempId,
       tempId,
@@ -140,7 +110,6 @@ export default function ConversationPage() {
       },
       isOptimistic: true,
     });
-
     socket.emit('message:send', { conversationId: id, content, imageUrl, tempId });
   };
 
@@ -164,10 +133,9 @@ export default function ConversationPage() {
         currentUserId={user?.id}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        bottomRef={bottomRef}
-        topRef={topRef}
         hasMore={hasMore}
-        containerRef={messageListRef}
+        onLoadMore={loadMore}
+        containerRef={containerRef}
       />
       <TypingIndicator conversationId={id} />
       <MessageInput onSend={handleSend} conversationId={id} />

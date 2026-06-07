@@ -808,12 +808,8 @@ input:focus {
   padding: 0 0.4rem;
 }
 
-.message--own .message-author {
-  display: none;
-}
-
 .message-content {
-  display: inline-block;
+  display: block;
   width: auto;
   max-width: min(720px, 80vw);
   background: var(--color-other-message);
@@ -823,6 +819,16 @@ input:focus {
   padding: 0.5rem 0.85rem;
   font-size: 0.9rem;
   word-break: break-word;
+}
+
+.message-select-btn {
+  display: inline-block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  width: auto;
 }
 
 .message--own .message-content {
@@ -970,7 +976,6 @@ input:focus {
 /* ── Message image ── */
 .message-image {
   width: 100%;
-  height: auto;
   border-radius: 8px;
   object-fit: cover;
 }
@@ -981,9 +986,11 @@ input:focus {
 
 .message-image-btn {
   background: transparent;
-  padding: 0;
   border: none;
+  padding: 0;
+  cursor: pointer;
   display: block;
+  margin-bottom: 0.35rem;
 }
 
 /* ── Modal ── */
@@ -1168,23 +1175,64 @@ input:focus {
   }
 }
 
-.server-wake-loading {
+/* ── Server wake up ── */
+.server-wakeup {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.server-wakeup-title {
+  font-family: 'Bruno Ace SC', sans-serif;
+  font-weight: 400;
+  font-size: 3rem;
+  color: var(--color-primary-hover);
+}
+
+.server-wakeup-title.animated span {
+  display: inline-block;
+  animation: letter-wave 1.5s ease-in-out infinite;
+}
+
+@keyframes letter-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.server-wakeup-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 2rem;
+  margin: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  max-width: 400px;
   text-align: center;
-  color: var(--muted, #666);
+
+  p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
 }
 
-.server-wake-text {
-  margin-top: 1rem;
-  font-weight: 600;
-}
-
-.server-wake-sub {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--muted, #666);
+.server-wakeup-elapsed {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
