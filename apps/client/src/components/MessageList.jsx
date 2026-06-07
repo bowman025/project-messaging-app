@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
+import { useParams } from 'react-router';
 import Avatar from './Avatar.jsx';
 
 export default function MessageList({
@@ -11,12 +12,19 @@ export default function MessageList({
   onLoadMore,
   containerRef,
 }) {
+  const { id: conversationId } = useParams();
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState('');
   const editInputRef = useRef(null);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const isInitialRenderComplete = useRef(false);
   const sentinelRef = useRef(null);
   const onLoadMoreRef = useRef(onLoadMore);
-  const [selectedId, setSelectedId] = useState(null);
+
+  useEffect(() => {
+    isInitialRenderComplete.current = false;
+  }, [conversationId]);
 
   useEffect(() => {
     onLoadMoreRef.current = onLoadMore;
@@ -27,19 +35,53 @@ export default function MessageList({
   }, [editingId]);
 
   useEffect(() => {
+    const container = containerRef?.current;
+    const currentSentinel = sentinelRef.current;
+    if (!container || !currentSentinel) return;
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) onLoadMoreRef.current();
+      ([entry]) => {
+        if (entry.isIntersecting && isInitialRenderComplete.current) {
+          onLoadMoreRef.current();
+        }
       },
-      { threshold: 0.1, root: containerRef?.current }
+      { threshold: 0.1, root: container }
     );
 
-    const current = sentinelRef.current;
-    if (current) observer.observe(current);
-    return () => {
-      if (current) observer.unobserve(current);
-    };
-  }, [onLoadMoreRef, containerRef]);
+    observer.observe(currentSentinel);
+    return () => observer.unobserve(currentSentinel);
+  }, [containerRef, conversationId]);
+
+  const forceScrollToBottom = useCallback((node) => {
+    if (!node) return;
+    node.style.scrollBehavior = 'auto';
+    node.scrollTop = node.scrollHeight;
+    isInitialRenderComplete.current = true;
+  }, []);
+
+  const setMergedRefs = useCallback((node) => {
+    if (containerRef) {
+      containerRef.current = node;
+    }
+
+    if (node && !isInitialRenderComplete.current) {
+      if (messages.length === 0) {
+        isInitialRenderComplete.current = true;
+      } else {
+        requestAnimationFrame(() => {
+          forceScrollToBottom(node);
+        });
+      }
+    }
+  }, [containerRef, forceScrollToBottom, messages.length]);
+
+  useEffect(() => {
+    if (!isInitialRenderComplete.current && messages.length > 0) {
+      requestAnimationFrame(() => {
+        forceScrollToBottom(containerRef?.current);
+      });
+    }
+  }, [messages.length, conversationId, forceScrollToBottom, containerRef]);
 
   const startEdit = (message) => {
     setEditingId(message.id);
@@ -59,10 +101,15 @@ export default function MessageList({
   };
 
   return (
-    <div className="message-list" ref={containerRef}>
-      <div ref={sentinelRef} className="message-list-top">
-        {hasMore && <div className="loading-spinner" />}
+    <div className="message-list" ref={setMergedRefs}>
+      <div ref={sentinelRef} className="message-list-top" style={{ height: '1px' }}>
+        {hasMore && (
+          <div style={{ padding: '10px 0', display: 'flex', justifyContent: 'center' }}>
+            <div className="loading-spinner" />
+          </div>
+        )}
       </div>
+
       {messages.map((message) => {
         const isOwn = message.authorId === currentUserId;
         return (
@@ -94,25 +141,12 @@ export default function MessageList({
                       <button
                         className="message-image-btn"
                         onClick={(e) => {
-                          /* Stops the click from triggering the parent div's select event */
                           e.stopPropagation();
                           window.open(message.imageUrl, '_blank');
                         }}
                         aria-label="Open attachment"
                       >
-                        <img
-                          src={message.imageUrl}
-                          alt="Attachment"
-                          className="message-image"
-                          onLoad={() => {
-                            const container = containerRef?.current;
-                            if (!container) return;
-                            const distanceFromBottom =
-                              container.scrollHeight - container.scrollTop - container.clientHeight;
-                            if (distanceFromBottom < 200)
-                              container.scrollTop = container.scrollHeight;
-                          }}
-                        />
+                        <img src={message.imageUrl} alt="Attachment" className="message-image" />
                       </button>
                     )}
                     {message.content && (
@@ -131,20 +165,7 @@ export default function MessageList({
                       onClick={() => window.open(message.imageUrl, '_blank')}
                       aria-label="Open attachment"
                     >
-                      <img
-                        src={message.imageUrl}
-                        alt="Attachment"
-                        className="message-image"
-                        onLoad={() => {
-                          const container = containerRef?.current;
-                          if (!container) return;
-                          const distanceFromBottom =
-                            container.scrollHeight - container.scrollTop - container.clientHeight;
-                          if (distanceFromBottom < 200) {
-                            container.scrollTop = container.scrollHeight;
-                          }
-                        }}
-                      />
+                      <img src={message.imageUrl} alt="Attachment" className="message-image" />
                     </button>
                   )}
                   {message.content && (

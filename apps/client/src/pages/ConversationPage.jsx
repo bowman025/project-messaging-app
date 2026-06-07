@@ -1,5 +1,5 @@
 import { useLoaderData, useParams, useNavigate } from 'react-router';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { useMessageStore } from '../store/messageStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -37,6 +37,7 @@ export default function ConversationPage() {
   const addMessage = useMessageStore((state) => state.addMessage);
   const clearUnread = useConversationStore((state) => state.clearUnread);
   const user = useAuthStore((state) => state.user);
+
   const containerRef = useRef(null);
   const isLoadingMore = useRef(false);
 
@@ -49,22 +50,8 @@ export default function ConversationPage() {
   const isNearBottom = useCallback(() => {
     const container = containerRef.current;
     if (!container) return true;
-    return container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < 150;
   }, []);
-
-  useEffect(() => {
-    setMessages(conversation.messages, conversation.nextCursor);
-  }, [conversation.messages, conversation.nextCursor, setMessages]);
-
-  useEffect(() => {
-    clearUnread(id);
-    const timer = setTimeout(() => scrollToBottom(), 0);
-    return () => clearTimeout(timer);
-  }, [id, clearUnread, scrollToBottom]);
-
-  useEffect(() => {
-    if (isNearBottom()) scrollToBottom();
-  }, [messages, isNearBottom, scrollToBottom]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore.current || !nextCursor) return;
@@ -88,6 +75,22 @@ export default function ConversationPage() {
       isLoadingMore.current = false;
     }
   }, [id, nextCursor, hasMore, prependMessages]);
+
+  useLayoutEffect(() => {
+    setMessages(conversation.messages, conversation.nextCursor);
+  }, [conversation.messages, conversation.nextCursor, setMessages]);
+
+  useEffect(() => {
+    clearUnread(id);
+  }, [id, clearUnread]);
+
+  const totalMessagesCount = messages.length;
+  const lastMessageId = messages[messages.length - 1]?.id;
+  useEffect(() => {
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
+  }, [totalMessagesCount, lastMessageId, isNearBottom, scrollToBottom]);
 
   const handleSend = ({ content, imageUrl } = {}) => {
     const socket = getSocket();
@@ -126,9 +129,10 @@ export default function ConversationPage() {
   };
 
   return (
-    <div className="conversation-page">
+    <div className="conversation-page" key={id}>
       <ConversationHeader conversation={displayedConversation} />
       <MessageList
+        key={id}
         messages={messages}
         currentUserId={user?.id}
         onEdit={handleEdit}
