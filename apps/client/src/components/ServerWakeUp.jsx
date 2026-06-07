@@ -14,7 +14,7 @@ export default function ServerWakeUp({ children }) {
 
     const ping = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/health`);
+        const res = await fetch(`${API_BASE_URL}/status`);
         if (res.ok) {
           setStatus('awake');
           return;

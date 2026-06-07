@@ -1,25 +1,30 @@
 import rateLimit from 'express-rate-limit';
 
+const createLimitMessage = (windowMs) => ({
+  status: 'error',
+  message: `Too many requests, please try again in ${Math.ceil(windowMs / 60 / 1000)} minutes`
+});
+
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { status: 'error', message: 'Too many attempts, please try again later' },
+  max: 30,
+  message: createLimitMessage(15 * 60 * 1000),
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
-  message: { status: 'error', message: 'Too many requests, please try again later' },
+  max: 600,
+  message: createLimitMessage(15 * 60 * 1000),
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 export const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   max: 20,
-  message: { status: 'error', message: 'Upload limit reached, please try again later' },
+  message: createLimitMessage(15 * 60 * 1000),
   standardHeaders: true,
   legacyHeaders: false,
 });

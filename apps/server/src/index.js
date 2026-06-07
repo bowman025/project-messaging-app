@@ -57,7 +57,7 @@ app.use('/api/', apiLimiter);
 app.use('/api/auth', authLimiter);
 app.use('/api/upload', uploadLimiter);
 
-app.get('/health', (req, res) => {
+app.get('/status', (req, res) => {
   res.json({ status: 'ok' });
 });
 
