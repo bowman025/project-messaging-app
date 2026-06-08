@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { fetchWithAuth } from '../lib/api.js';
@@ -14,6 +14,29 @@ export default function NewConversationModal({ onClose }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const addConversation = useConversationStore((state) => state.addConversation);
+  const modalContentRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (modalContentRef.current && !modalContentRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose]);
 
   const isGroup = selected.length > 1;
 
@@ -86,7 +109,7 @@ export default function NewConversationModal({ onClose }) {
 
   const modal = (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="New conversation">
-      <div className="modal">
+      <div className="modal" ref={modalContentRef}>
         <div className="modal-header">
           <h2>{isGroup ? 'New Group' : 'New Conversation'}</h2>
           <button onClick={onClose} aria-label="Close">

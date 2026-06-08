@@ -548,7 +548,7 @@ input:focus {
 }
 
 .conversation-header-link:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-hover);
   text-decoration: none;
 }
 
@@ -625,6 +625,7 @@ input:focus {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
+  margin-top: 1rem;
   padding: 2rem;
   width: 100%;
   max-width: 480px;
@@ -693,7 +694,7 @@ input:focus {
 }
 
 .sidebar-username:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-hover);
   text-decoration: none;
 }
 
