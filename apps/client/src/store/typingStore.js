@@ -16,13 +16,19 @@ export const useTypingStore = create((set) => ({
 
   clearTyping: (conversationId, userId) =>
     set((state) => {
+      if (!state.typingUsers[conversationId]) return state;
+
       const conversationTyping = { ...state.typingUsers[conversationId] };
       delete conversationTyping[userId];
-      return {
-        typingUsers: {
-          ...state.typingUsers,
-          [conversationId]: conversationTyping,
-        },
-      };
+
+      const nextTypingUsers = { ...state.typingUsers };
+
+      if (Object.keys(conversationTyping).length === 0) {
+        delete nextTypingUsers[conversationId];
+      } else {
+        nextTypingUsers[conversationId] = conversationTyping;
+      }
+
+      return { typingUsers: nextTypingUsers };
     }),
 }));

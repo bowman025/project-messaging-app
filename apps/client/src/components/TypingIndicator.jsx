@@ -1,30 +1,27 @@
 import { useTypingStore } from '../store/typingStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { useMemo } from 'react';
-import { shallow } from 'zustand/shallow';
 
 export default function TypingIndicator({ conversationId }) {
-  const typingUsers = useTypingStore(
-    (state) => state.typingUsers[conversationId],
-    shallow
-  );
-
   const currentUserId = useAuthStore((state) => state.user?.id);
 
-  const otherTypingUsers = useMemo(() => {
-    if (!typingUsers) return [];
-    return Object.entries(typingUsers)
+  const roomMap = useTypingStore((state) => state.typingUsers[conversationId]);
+
+  const typingUsernames = useMemo(() => {
+    if (!roomMap) return [];
+
+    return Object.entries(roomMap)
       .filter(([userId]) => userId !== currentUserId)
       .map(([_, username]) => username);
-  }, [typingUsers, currentUserId]);
+  }, [roomMap, currentUserId]);
 
-  if (otherTypingUsers.length === 0) return null;
+  if (typingUsernames.length === 0) return null;
 
   const text =
-    otherTypingUsers.length === 1
-      ? `${otherTypingUsers[0]} is typing...`
-      : otherTypingUsers.length === 2
-        ? `${otherTypingUsers[0]} and ${otherTypingUsers[1]} are typing...`
+    typingUsernames.length === 1
+      ? `${typingUsernames[0]} is typing...`
+      : typingUsernames.length === 2
+        ? `${typingUsernames[0]} and ${typingUsernames[1]} are typing...`
         : 'Several people are typing...';
 
   return (
