@@ -1,10 +1,9 @@
-import { useNavigate, useParams, NavLink, Link } from 'react-router';
+import { useNavigate, NavLink, Link } from 'react-router';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
-import { fetchWithAuth } from '../lib/api.js';
-import { getSocket, disconnectSocket } from '../lib/socket.js';
+import { disconnectSocket } from '../lib/socket.js';
 import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import Avatar from './Avatar.jsx';
@@ -17,41 +16,16 @@ export default function Sidebar({
   onInteract,
 }) {
   const navigate = useNavigate();
-  const { id: activeId } = useParams();
   const { user } = useAuthStore();
   const onlineUsers = usePresenceStore((state) => state.onlineUsers);
   const storeConversations = useConversationStore((state) => state.conversations);
   const conversations = propConversations ?? storeConversations;
-  const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const { theme, toggleTheme } = useTheme();
 
-  const handleDelete = async (e, conversationId) => {
-    e.preventDefault();
-    e.stopPropagation();
 
-    const res = await fetchWithAuth(`/api/conversations/${conversationId}`, {
-      method: 'DELETE',
-    });
-
-    if (res.ok) {
-      removeConversation(conversationId);
-      if (activeId === conversationId) navigate('/conversations');
-    }
-  };
-
-  const handleLeave = async (e, conversationId) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const socket = getSocket();
-    if (socket) socket.emit('leave:conversation', { conversationId });
-
-    removeConversation(conversationId);
-    if (activeId === conversationId) navigate('/conversations');
-  };
 
   const handleLogout = () => {
     disconnectSocket();
@@ -89,10 +63,16 @@ export default function Sidebar({
       </div>
       <div className="sidebar-actions">
         <div className="sidebar-actions-main">
-          <button onClick={toggleTheme} aria-label="Toggle theme">
+          <button onClick={() => {
+            toggleTheme();
+            if (typeof onInteract === 'function') onInteract();
+          }} aria-label="Toggle theme">
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={() => {
+            handleLogout();
+            if (typeof onInteract === 'function') onInteract();
+          }}>Logout</button>
         </div>
         <button className="sidebar-actions-new"
           onClick={() => {
@@ -140,29 +120,6 @@ export default function Sidebar({
               </div>
               {unreadCounts[conversation.id] > 0 && (
                 <span className="unread-badge">{unreadCounts[conversation.id]}</span>
-              )}
-              {conversation.creatorId === user?.id ? (
-                <button
-                  className="conversation-delete"
-                  onClick={(e) => {
-                    handleDelete(e, conversation.id);
-                    if (typeof onInteract === 'function') onInteract();
-                  }}
-                  aria-label="Delete conversation"
-                >
-                  ✕
-                </button>
-              ) : (
-                <button
-                  className="conversation-delete"
-                  onClick={(e) => {
-                    handleLeave(e, conversation.id);
-                    if (typeof onInteract === 'function') onInteract();
-                  }}
-                  aria-label="Leave conversation"
-                >
-                  ←
-                </button>
               )}
             </div>
           </NavLink>

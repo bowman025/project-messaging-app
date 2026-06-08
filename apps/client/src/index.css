@@ -466,25 +466,6 @@ input:focus {
   flex-shrink: 0;
 }
 
-.conversation-delete {
-  background: transparent;
-  color: transparent;
-  border: none;
-  font-size: 0.7rem;
-  padding: 0.1rem 0.3rem;
-  border-radius: 4px;
-  line-height: 1;
-}
-
-.conversation-item:hover .conversation-delete {
-  color: var(--color-text-muted);
-}
-
-.conversation-delete:hover {
-  color: var(--color-danger) !important;
-  background: transparent;
-}
-
 .online-indicator {
   display: inline-block;
   width: 8px;
@@ -526,11 +507,12 @@ input:focus {
 
 /* ── Conversation header ── */
 .conversation-header {
-  padding: 0.85rem 8rem 0.85rem 3.5rem;
+  padding: 0.85rem 0.85rem 0.85rem 4rem;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
   flex-shrink: 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
   line-break: anywhere;
@@ -547,7 +529,13 @@ input:focus {
   text-decoration: none;
 }
 
-.conversation-header-name {
+.conversation-header-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.conversation-header-title {
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -558,11 +546,20 @@ input:focus {
   margin-top: 0.1rem;
 }
 
-.conversation-header-bio {
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
-  margin-top: 0.15rem;
-  font-style: italic;
+.conversation-header-delete {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.conversation-header-delete:hover {
+  color: var(--color-danger-hover);
+  background: transparent;
+  border-color: var(--color-danger-hover);
 }
 
 /* ── Avatar ── */
