@@ -1,4 +1,4 @@
-import { findUsersByUsername, updateUser } from '../services/userService.js';
+import { findUsersByUsername, updateUser, findUserById } from '../services/userService.js';
 import { updateProfileSchema } from '@project-messaging-app/zod-schemas/user';
 import { AppError } from '../utils/AppError.js';
 import cloudinary from '../config/cloudinary.js';
@@ -21,6 +21,16 @@ export const searchUsers = async (req, res, next) => {
 export const getProfile = (req, res) => {
   const { _passwordHash, ...user } = req.user;
   res.json({ status: 'success', user });
+};
+
+export const getUserProfile = async (req, res, next) => {
+  try {
+    const user = await findUserById(req.params.id);
+    const { passwordHash: _passwordHash, ...rest } = user;
+    res.json({ status: 'success', user: rest });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const patchProfile = async (req, res, next) => {

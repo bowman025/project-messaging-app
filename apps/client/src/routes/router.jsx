@@ -5,6 +5,7 @@ import AppLayout from '../layouts/AppLayout.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
+import UserProfilePage from '../pages/UserProfilePage.jsx';
 import ConversationsPage from '../pages/ConversationsPage.jsx';
 import ConversationPage from '../pages/ConversationPage.jsx';
 import NotFoundPage from '../pages/NotFoundPage.jsx';
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         hydrateFallbackElement: FallbackUI,
       },
+      { path: 'users/:id', element: <UserProfilePage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

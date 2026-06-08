@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import Avatar from './Avatar.jsx';
@@ -19,7 +20,15 @@ export default function ConversationHeader({ conversation }) {
     <div className="conversation-header">
       <Avatar user={otherUser} size="md" />
       <div>
-        <div className="conversation-header-name">{name}</div>
+        <div className="conversation-header-name">
+          {!conversation.isGroup && otherUser ? (
+            <Link to={`/users/${otherUser.id}`} className="conversation-header-link">
+              {name}
+            </Link>
+          ) : (
+            name
+          )}
+        </div>
         <div className="conversation-header-subtitle">{subtitle}</div>
       </div>
     </div>
