@@ -11,19 +11,24 @@ export default function MessageInput({ onSend, conversationId }) {
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
+  const activeTypingRoomRef = useRef(null);
 
   const emitTypingStart = () => {
     const socket = getSocket();
     if (!socket || isTypingRef.current) return;
     isTypingRef.current = true;
+    activeTypingRoomRef.current = conversationId;
     socket.emit('typing:start', { conversationId });
   };
 
   const emitTypingStop = () => {
     const socket = getSocket();
+    const targetRoom = activeTypingRoomRef.current || conversationId;
+
     if (!socket || !isTypingRef.current) return;
     isTypingRef.current = false;
-    socket.emit('typing:stop', { conversationId });
+    activeTypingRoomRef.current = null;
+    socket.emit('typing:stop', { conversationId: targetRoom });
   };
 
   const handleContentChange = (e) => {
@@ -39,14 +44,23 @@ export default function MessageInput({ onSend, conversationId }) {
     }
   };
 
+  const canSend = (content.trim() || imageUrl) && !isUploading;
+
   const handleSubmit = (e) => {
     e?.preventDefault();
-    if (!content.trim() && !imageUrl) return;
+    if (!canSend) return;
+
     clearTimeout(typingTimeoutRef.current);
     emitTypingStop();
+
     onSend({ content: content.trim() || undefined, imageUrl: imageUrl || undefined });
+
     setContent('');
     setImageUrl(null);
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImagePreview(null);
     setError(null);
   };
@@ -54,6 +68,10 @@ export default function MessageInput({ onSend, conversationId }) {
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
 
     setImagePreview(URL.createObjectURL(file));
     setIsUploading(true);
@@ -73,18 +91,27 @@ export default function MessageInput({ onSend, conversationId }) {
   };
 
   const handleRemoveImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImagePreview(null);
     setImageUrl(null);
     setError(null);
   };
 
-  const canSend = (content.trim() || imageUrl) && !isUploading;
-
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeoutRef.current);
+      if (isTypingRef.current) {
+        const socket = getSocket();
+        const room = activeTypingRoomRef.current || conversationId;
+        if (socket) socket.emit('typing:stop', { conversationId: room });
+      }
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
     };
-  }, []);
+  }, [conversationId, imagePreview]);
 
   return (
     <div className="message-input-container">
