@@ -14,6 +14,4 @@ export const usePresenceStore = create((set) => ({
       next.delete(userId);
       return { onlineUsers: next };
     }),
-
-  isOnline: (userId) => (state) => state.onlineUsers.has(userId),
 }));

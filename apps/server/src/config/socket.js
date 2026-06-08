@@ -5,12 +5,19 @@ export const getIO = () => ioInstance;
 import { createMessage, editMessage, deleteMessage } from '../services/messageService.js';
 import { getConversationById, leaveConversation } from '../services/conversationService.js';
 
+const connectedUserRegistry = new Map();
+
 export const initSocket = (io) => {
   ioInstance = io;
   io.use(socketAuthenticate);
 
   io.on('connection', (socket) => {
     const userId = socket.user.id;
+
+    if (!connectedUserRegistry.has(userId)) {
+      connectedUserRegistry.set(userId, new Set());
+    }
+    connectedUserRegistry.get(userId).add(socket.id);
 
     socket.on('join:conversations', async (conversationIds) => {
       if (!Array.isArray(conversationIds)) return;
@@ -92,9 +99,13 @@ export const initSocket = (io) => {
 
     socket.on('presence:online', async (conversationIds) => {
       if (!Array.isArray(conversationIds)) return;
+
       conversationIds.forEach((id) => {
         socket.to(id).emit('presence:online', { userId });
       });
+
+      const currentlyActiveUsers = Array.from(connectedUserRegistry.keys());
+      socket.emit('presence:sync', { onlineUserIds: currentlyActiveUsers });
     });
 
     socket.on('typing:start', ({ conversationId }) => {
@@ -113,17 +124,26 @@ export const initSocket = (io) => {
     });
 
     socket.on('disconnecting', () => {
-      for (const room of socket.rooms) {
-        if (room === socket.id) continue;
+      const userSockets = connectedUserRegistry.get(userId);
+      if (userSockets) {
+        userSockets.delete(socket.id);
 
-        socket.to(room).emit('typing:stop', {
-          userId,
-          conversationId: room,
-        });
+        if (userSockets.size === 0) {
+          connectedUserRegistry.delete(userId);
 
-        socket.to(room).emit('presence:offline', {
-          userId,
-        });
+          for (const room of socket.rooms) {
+            if (room === socket.id) continue;
+
+            socket.to(room).emit('typing:stop', {
+              userId,
+              conversationId: room,
+            });
+
+            socket.to(room).emit('presence:offline', {
+              userId,
+            });
+          }
+        }
       }
     });
   });

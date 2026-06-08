@@ -11,17 +11,20 @@ import {
 import { fetchWithAuth } from '../lib/api.js';
 import { getSocket } from '../lib/socket.js';
 
-
 export default function ConversationHeader({ conversation }) {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const onlineUsers = usePresenceStore((state) => state.onlineUsers);
   const removeConversation = useConversationStore((state) => state.removeConversation);
-
   const { id: activeId } = useParams();
   const otherUser = getOtherUser(conversation, user?.id);
+  const otherUserId = otherUser?.id;
+  const isOtherUserOnline = usePresenceStore((state) =>
+    !conversation.isGroup && otherUserId ? state.onlineUsers.has(otherUserId) : false
+  );
   const name = getConversationName(conversation, user?.id);
-  const subtitle = getConversationSubtitle(conversation, user?.id, onlineUsers);
+  const subtitle = conversation.isGroup
+    ? getConversationSubtitle(conversation, user?.id)
+    : isOtherUserOnline ? 'Online' : 'Offline';
 
   const handleDelete = async (e, conversationId) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ export default function ConversationHeader({ conversation }) {
   return (
     <div className="conversation-header">
       <div className="conversation-header-info">
-        <Avatar user={otherUser} size="md" />
+        <Avatar user={conversation.isGroup ? null : otherUser} size="md" />
         <div className="conversation-header-text">
           <div className="conversation-header-title">
             {!conversation.isGroup && otherUser ? (

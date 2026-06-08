@@ -87,6 +87,14 @@ export const useSocket = (conversations, activeConversationId) => {
       }
     };
 
+    const handlePresenceSync = ({ onlineUserIds }) => {
+      if (!Array.isArray(onlineUserIds)) return;
+
+      onlineUserIds.forEach((userId) => {
+        usePresenceStore.getState().setOnline(userId);
+      });
+    };
+
     const handlePresenceOnline = ({ userId }) => {
       usePresenceStore.getState().setOnline(userId);
     };
@@ -132,6 +140,7 @@ export const useSocket = (conversations, activeConversationId) => {
     socket.on('message:edited', handleEditedMessage);
     socket.on('message:deleted', handleDeletedMessage);
 
+    socket.on('presence:sync', handlePresenceSync);
     socket.on('presence:online', handlePresenceOnline);
     socket.on('presence:offline', handlePresenceOffline);
 
@@ -153,6 +162,7 @@ export const useSocket = (conversations, activeConversationId) => {
       socket.off('message:edited', handleEditedMessage);
       socket.off('message:deleted', handleDeletedMessage);
 
+      socket.off('presence:sync', handlePresenceSync);
       socket.off('presence:online', handlePresenceOnline);
       socket.off('presence:offline', handlePresenceOffline);
 
