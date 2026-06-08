@@ -1,11 +1,9 @@
-import { Outlet, useLoaderData, useNavigation, useParams, useNavigate } from 'react-router';
+import { Outlet, useLoaderData, useNavigation, useParams } from 'react-router';
 import { useState, useEffect } from 'react';
 import { useConversationStore } from '../store/conversationStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { useSocket } from '../hooks/useSocket.js';
 import Sidebar from '../components/Sidebar.jsx';
-import { useTheme } from '../hooks/useTheme.js';
-import { disconnectSocket } from '../lib/socket.js';
 
 export default function AppLayout() {
   const { user, conversations: loaderConversations } = useLoaderData();
@@ -14,9 +12,7 @@ export default function AppLayout() {
   const navigation = useNavigation();
   const { id: activeConversationId } = useParams();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
-  const clearAuth = useAuthStore((state) => state.clearAuth);
+
 
   const isLoading = navigation.state === 'loading';
 
@@ -49,12 +45,6 @@ export default function AppLayout() {
     };
   }, [sidebarCollapsed]);
 
-  const handleLogout = () => {
-    disconnectSocket();
-    clearAuth();
-    navigate('/login');
-  };
-
   return (
     <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <button
@@ -71,12 +61,6 @@ export default function AppLayout() {
         collapsed={sidebarCollapsed}
         onInteract={() => setSidebarCollapsed(true)}
       />
-      <div className="sidebar-header-actions fixed">
-        <button onClick={toggleTheme} aria-label="Toggle theme">
-          {theme === 'light' ? '🌙' : '☀️'}
-        </button>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
       <main className="main-content">
         {isLoading ? (
           <div className="loading-state">

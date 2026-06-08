@@ -4,11 +4,12 @@ import { useAuthStore } from '../store/authStore.js';
 import { usePresenceStore } from '../store/presenceStore.js';
 import { useConversationStore } from '../store/conversationStore.js';
 import { fetchWithAuth } from '../lib/api.js';
-import { getSocket } from '../lib/socket.js';
+import { getSocket, disconnectSocket } from '../lib/socket.js';
 import { formatDistanceToNow, format } from 'date-fns';
 import NewConversationModal from './NewConversationModal.jsx';
 import Avatar from './Avatar.jsx';
 import { getOtherUser, getConversationName, isConversationOnline } from '../utils/participants.js';
+import { useTheme } from '../hooks/useTheme.js';
 
 export default function Sidebar({
   conversations: propConversations,
@@ -24,6 +25,8 @@ export default function Sidebar({
   const removeConversation = useConversationStore((state) => state.removeConversation);
   const unreadCounts = useConversationStore((state) => state.unreadCounts);
   const [showModal, setShowModal] = useState(false);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const { theme, toggleTheme } = useTheme();
 
   const handleDelete = async (e, conversationId) => {
     e.preventDefault();
@@ -48,6 +51,12 @@ export default function Sidebar({
 
     removeConversation(conversationId);
     if (activeId === conversationId) navigate('/conversations');
+  };
+
+  const handleLogout = () => {
+    disconnectSocket();
+    clearAuth();
+    navigate('/login');
   };
 
   const getLastMessage = (conversation) => {
@@ -79,7 +88,13 @@ export default function Sidebar({
         </div>
       </div>
       <div className="sidebar-actions">
-        <button
+        <div className="sidebar-actions-main">
+          <button onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+        <button className="sidebar-actions-new"
           onClick={() => {
             setShowModal(true);
             if (typeof onInteract === 'function') onInteract();
