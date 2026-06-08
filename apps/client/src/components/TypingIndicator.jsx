@@ -1,12 +1,14 @@
 import { useTypingStore } from '../store/typingStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { useMemo } from 'react';
+import { shallow } from 'zustand/shallow';
 
 export default function TypingIndicator({ conversationId }) {
   const typingUsers = useTypingStore(
     (state) => state.typingUsers[conversationId],
-    (a, b) => a === b
+    shallow
   );
+
   const currentUserId = useAuthStore((state) => state.user?.id);
 
   const otherTypingUsers = useMemo(() => {
